@@ -1,0 +1,5 @@
+*.tgz
+config/
+*.sublime-*
+example/node_modules
+example/build

@@ -1,0 +1,93 @@
+#!/usr/bin/env node
+'use strict';
+
+// ------------------------------------------------------------------------------------------ Dependencies
+
+const path = require('path');
+const npmi = require('npmi');
+const fs = require('fs-extra');
+const program = require('commander');
+const pkg = require('../package.json');
+const Compiler = require('../dist/compiler').default;
+
+// ------------------------------------------------------------------------------------------ Application
+
+program.version(pkg.version)
+       .usage('command [options]');
+
+program.command('init')
+       .description('Initialise a new Nagios project')
+       .action(function() {
+          fs.copy(path.join(__dirname,'./example'), process.cwd(), (err) => {
+            if(err) {
+              return console.error('Unable to initialise Nagios:\n' + err);
+            }
+
+            npmi(process.cwd(), () => {
+              console.log('Nagios project initialised succesfully!');
+            });
+          }); 
+       });
+
+program.command('compile')
+       .description('Compile nagios configuration')
+       .option('-f, --file <path>',  'Entry point for generating Nagios configuration, defaults to "main" property of package.json')
+       .action(function(options) {
+          const entryPoint = Compiler.getEntryPoint(options.file);
+
+          if (!entryPoint) {
+            console.log();
+            console.log('Error: could not find Nagios configuration entry point');
+            console.log('Either specify --file option, or set the "main" property in package.json');
+            program.outputHelp();
+            console.log();
+          } else {
+            const compiler = new Compiler(entryPoint, './config');
+            compiler.compile().then(() => {
+              console.log('Finished compiling Nagios configuration');
+            }).catch((error) => {
+              console.log('ERROR: failed to compile nagios configuration');
+              console.log(error);
+            })
+          }
+       });
+
+program.command('test')
+       .description('Compile and test nagios configuration (requires Docker)')
+       .action(function() {
+          console.log('you called test');
+       });
+
+program.command('execute [identifier]')
+       .description('Run the command for the specified service')
+       .option('-f, --file <path>',  'Entry point for generating Nagios configuration, defaults to "main" property of package.json')
+       .option('-c, --command <identifier>',  'The identifier for the service command to be executed')
+       .action(function(identifier, options) {
+          identifier = identifier || options.command;
+          const entryPoint = Compiler.getEntryPoint(options.file);
+
+          if (!entryPoint) {
+            console.log();
+            console.log('Error: could not find Nagios configuration entry point');
+            console.log('Either specify --file option, or set the "main" property in package.json');
+            program.outputHelp();
+            console.log();
+          } else {
+            const cmd = eval(`entryPoint.nagios.${identifier}`);
+            if (cmd) { 
+              cmd.execute();
+            } else {
+              console.log();
+              console.log('Error: could not find specified command in Nagios configuration');
+              program.outputHelp();
+              console.log();
+            }
+          }
+       });
+
+program.parse(process.argv);
+
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+  console.log();
+}
