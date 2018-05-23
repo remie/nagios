@@ -1,0 +1,27 @@
+
+export const cgi = {
+  main_config_file: '/usr/local/nagios/etc/nagios.cfg',
+  physical_html_path: '/usr/local/nagios/share',
+  url_html_path: '/nagios',
+  show_context_help: false,
+  use_pending_states: true,
+  use_authentication: true,
+  use_ssl_authentication: false,
+  authorized_for_system_information: 'nagiosadmin',
+  authorized_for_configuration_information: 'nagiosadmin',
+  authorized_for_system_commands: 'nagiosadmin',
+  authorized_for_all_services: 'nagiosadmin',
+  authorized_for_all_hosts: 'nagiosadmin',
+  authorized_for_all_service_commands: 'nagiosadmin',
+  authorized_for_all_host_commands: 'nagiosadmin',
+  default_statuswrl_layout: 4,
+  ping_syntax: '/bin/ping -n -U -c 5 $HOSTADDRESS$',
+  refresh_rate: 90,
+  result_limit: 100,
+  escape_html_tags: true,
+  action_url_target: '_blank',
+  notes_url_target: '_blank',
+  lock_author_names: true,
+  navbar_search_for_addresses: false,
+  navbar_search_for_aliases: false
+};

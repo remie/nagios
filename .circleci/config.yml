@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+
+    docker:
+      - image: circleci/node:8
+
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - npm-cache-{{ checksum "package.json" }}
+
+      - run: 
+          name: Install dependencies
+          command: npm install
+
+      - save_cache:
+          key: npm-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+      - deploy:
+          name: Deploy to NPM (master only)
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+              npm publish
+            else
+              echo "Only builds from 'master' branch are published on NPM"
+            fi

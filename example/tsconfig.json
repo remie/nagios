@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "typeRoots": [
+            "./node_modules/@types",
+            "./typings/gobals",
+            "./typings/modules"
+        ],
+        "experimentalDecorators": true,
+        "module": "commonjs",
+        "target": "es6",
+        "noImplicitAny": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "declaration": true,
+        "rootDir": "./src"
+    },
+    "includes": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "typings",
+        "node_modules"
+    ]
+}

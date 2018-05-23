@@ -1,0 +1,43 @@
+import { ObjectDefinition } from './ObjectDefinition';
+
+export interface Cgi extends ObjectDefinition {
+  main_config_file: string;
+  physical_html_path?: string;
+  url_html_path?: string;
+  show_context_help?: boolean;
+  use_pending_states?: boolean;
+  use_authentication?: boolean;
+  use_ssl_authentication?: boolean;
+  default_user_name?: string;
+  authorized_for_system_information?: string;
+  authorized_for_system_commands?: string;
+  authorized_for_configuration_information?: string;
+  authorized_for_all_hosts?: string;
+  authorized_for_all_host_commands?: string;
+  authorized_for_all_services?: string;
+  authorized_for_all_service_commands?: string;
+  authorized_for_read_only?: string;
+  lock_author_names?: boolean;
+  navbar_search_for_addresses: boolean;
+  navbar_search_for_aliases: boolean;
+  statusmap_background_image?: string;
+  color_transparency_index_r?: number;
+  color_transparency_index_g?: number;
+  color_transparency_index_b?: number;
+  default_statusmap_layout?: string;
+  statuswrl_include?: string;
+  default_statuswrl_layout?: number;
+  refresh_rate?: number;
+  result_limit?: number;
+  host_unreachable_sound?: string;
+  host_down_sound?: string;
+  service_critical_sound?: string;
+  service_warning_sound?: string;
+  service_unknown_sound?: string;
+  ping_syntax?: string;
+  escape_html_tags?: boolean;
+  notes_url_target?: string;
+  action_url_target?: string;
+  enable_splunk_integration?: boolean;
+  splunk_url?: string;
+}
