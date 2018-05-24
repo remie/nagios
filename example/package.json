@@ -19,6 +19,6 @@
     "typescript": "^2.8.3"
   },
   "dependencies": {
-    "@remie/nagios-cli": "0.0.10"
+    "@remie/nagios-cli": "latest"
   }
 }
