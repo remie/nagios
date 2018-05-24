@@ -18,7 +18,7 @@ program.version(pkg.version)
 program.command('init')
        .description('Initialise a new Nagios project')
        .action(function() {
-          fs.copy(path.join(__dirname,'./example'), process.cwd(), (err) => {
+          fs.copy(path.join(__dirname,'../example'), process.cwd(), (err) => {
             if(err) {
               return console.error('Unable to initialise Nagios:\n' + err);
             }
