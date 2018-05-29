@@ -4,12 +4,14 @@
   "description": "",
   "main": "./build/index.js",
   "scripts": {
-    "clean": "rm -rf node_modules && npm install && npm link @remie/nagios-cli",
-    "build": "./node_modules/.bin/gulp build"
+    "build": "./node_modules/.bin/gulp build",
+    "compile": "npm run build && ./node_modules/.bin/nagios-cli compile -f ./build/index.js",
+    "test": "./test.sh"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/systeminformation": "^3.23.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^2.6.4",
@@ -19,6 +21,8 @@
     "typescript": "^2.8.3"
   },
   "dependencies": {
-    "@remie/nagios-cli": "latest"
+    "@remie/nagios-cli": "latest",
+    "ping": "^0.2.2",
+    "systeminformation": "^3.41.3"
   }
 }

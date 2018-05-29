@@ -1,7 +1,7 @@
 FROM remie/docker-nagios:1.2.0
 
-## Update the package manager
-RUN yum -y update; yum clean all;
+## Update the package manager & install build essentials
+RUN yum -y update; yum clean all; yum -y groupinstall 'Development Tools';
 
 ## Installing NodeJS
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
@@ -19,12 +19,6 @@ RUN npm install && npm install @remie/nagios-cli@latest
 
 ## Copy sources
 COPY ./src ./src
-COPY ./gulpfile.js ./tsconfig.json ./tslint.json ./
+COPY ./gulpfile.js ./tsconfig.json ./tslint.json ./htpasswd.users ./start.sh ./
 
-## Compile Nagios configuration
-RUN npm run build; \
-	nagios-cli compile -f ./build/index.js;
-
-RUN	rm -rf /usr/local/nagios/etc; \
-	cp -R config /usr/local/nagios/etc; 
-	#/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg;
+CMD ["/opt/nagios/start.sh"]

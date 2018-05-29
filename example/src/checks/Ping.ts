@@ -1,15 +1,19 @@
 
-import { Check } from '@remie/nagios-cli';
+import { Check, CheckResult, NagiosResult } from '@remie/nagios-cli';
+import * as ping from 'ping';
 
 export default class Ping implements Check {
+  private host: string;
 
-  private text;
-
-  constructor(text) {
-    this.text = text;
+  constructor(host: string) {
+    this.host = host;
   }
 
-  execute() {
-    console.log(this.text);
+  async execute(): Promise<CheckResult> {
+    const result = await ping.promise.probe(this.host);
+    return {
+      message: result.output,
+      code: result.alive ? NagiosResult.OK : NagiosResult.CRITICAL
+    };
   }
 }

@@ -6,7 +6,7 @@ import del from 'del';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { Timeperiod, Contact, ContactGroup } from './types';
-import { RefObj, ObjectType, ContactObj, ContactGroupObj, HostObj, HostGroupObj, NagiosCfg, NagiosObj, ServiceObj, ServiceGroupObj, TimeperiodObj } from './objects';
+import { RefObj, ObjectType, ContactObj, ContactGroupObj, HostObj, HostGroupObj, NagiosCfg, NagiosObj, InheritableNagiosObj, ServiceObj, ServiceGroupObj, TimeperiodObj } from './objects';
 import CommandObj from './objects/command';
 import slugify from 'slugify';
 
@@ -209,15 +209,15 @@ export default class Compiler {
     // Processs object definitions
     // Use promises to speed up the processing
     const promises: Array<Promise<any>> = [];
-    promises.push(...this.contacts.map((contact: ContactObj) => fs.writeFile(path.join(this.outputDir, `contacts/${contact.configuration.contact_name}.cfg`), this.toObject('contact', contact.configuration), 'utf-8')));
-    promises.push(...this.contactgroups.map((contactgroup: ContactGroupObj) => fs.writeFile(path.join(this.outputDir, `contactgroupss/${contactgroup.configuration.contactgroup_name}.cfg`), this.toObject('contact', contactgroup.configuration), 'utf-8')));
-    promises.push(...this.hosts.map((host: HostObj) => fs.writeFile(path.join(this.outputDir, `hosts/${host.configuration.host_name}.cfg`), this.toObject('host', host.configuration), 'utf-8')));
-    promises.push(...this.hostgroups.map((hostgroup: HostGroupObj) => fs.writeFile(path.join(this.outputDir, `hosts/${hostgroup.configuration.hostgroup_name}.cfg`), this.toObject('host', hostgroup.configuration), 'utf-8')));
-    promises.push(...this.services.map((service: ServiceObj) => fs.writeFile(path.join(this.outputDir, `services/${service.configuration.name}.cfg`), this.toObject('service', service.configuration), 'utf-8')));
-    promises.push(...this.timeperiods.map((timeperiod: TimeperiodObj) => fs.writeFile(path.join(this.outputDir, `timeperiods/${timeperiod.configuration.timeperiod_name}.cfg`), this.toObject('timeperiod', timeperiod.configuration), 'utf-8')));
+    promises.push(...this.contacts.map((contact: ContactObj) => fs.writeFile(path.join(this.outputDir, `contacts/${contact.configuration.contact_name}.cfg`), this.toObject(contact), 'utf-8')));
+    promises.push(...this.contactgroups.map((contactgroup: ContactGroupObj) => fs.writeFile(path.join(this.outputDir, `contactgroupss/${contactgroup.configuration.contactgroup_name}.cfg`), this.toObject(contactgroup), 'utf-8')));
+    promises.push(...this.hosts.map((host: HostObj) => fs.writeFile(path.join(this.outputDir, `hosts/${host.configuration.host_name}.cfg`), this.toObject(host), 'utf-8')));
+    promises.push(...this.hostgroups.map((hostgroup: HostGroupObj) => fs.writeFile(path.join(this.outputDir, `hosts/${hostgroup.configuration.hostgroup_name}.cfg`), this.toObject(hostgroup), 'utf-8')));
+    promises.push(...this.services.map((service: ServiceObj) => fs.writeFile(path.join(this.outputDir, `services/${service.configuration.name}.cfg`), this.toObject(service), 'utf-8')));
+    promises.push(...this.timeperiods.map((timeperiod: TimeperiodObj) => fs.writeFile(path.join(this.outputDir, `timeperiods/${timeperiod.configuration.timeperiod_name}.cfg`), this.toObject(timeperiod), 'utf-8')));
 
     // Process command
-    const binPath = path.resolve(path.join(process.cwd(), 'bin/nagios-cli'));
+    const binPath = path.resolve(path.join(process.cwd(), './node_modules/.bin/nagios-cli'));
     promises.push(fs.writeFile(path.join(this.outputDir, `commands/nagios-cli.cfg`), `
 define command {
   command_name  nagios-cli
@@ -276,12 +276,12 @@ define command {
     return cfg;
   }
 
-  private toObject(type: ObjectType, configuration: { [id: string]: any }) {
+  private toObject(instance: NagiosObj|InheritableNagiosObj) {
     let cfg = '\n';
-    cfg += `define ${type} {\n`;
+    cfg += `define ${instance.objectType} {\n`;
 
-    Object.keys(configuration).forEach(key => {
-      let value = configuration[key];
+    Object.keys(instance.configuration).forEach(key => {
+      let value = instance.configuration[key];
       if (value instanceof Array) {
         value = value.join(',');
       } else if (typeof value === 'boolean') {

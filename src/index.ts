@@ -1,4 +1,4 @@
 
 export * from './decorators';
 export * from './objects';
-export { Check } from './types/check';
+export { Check, CheckResult, NagiosResult } from './types/check';

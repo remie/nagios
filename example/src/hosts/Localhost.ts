@@ -1,9 +1,9 @@
 
-import { Host, HostObj, ServiceObj, ContactObj, ContactGroupObj, Ref, Check } from '@remie/nagios-cli';
-import { PingService } from '../services/PingService';
+import { Host, HostObj, ServiceObj, ContactObj, ContactGroupObj, Include, Check } from '@remie/nagios-cli';
+import { PingService, RootPartitionService } from '../services';
 import DefaultContact from '../contacts/DefaultContact';
 import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
-import Ping from '../checks/Ping';
+import { Ping } from '../checks';
 
 @Host({
   host_name: 'localhost',
@@ -19,25 +19,15 @@ import Ping from '../checks/Ping';
   notification_period: '24x7',
   notification_options: 'd,u,r'
 })
-@Ref('timeperiod', DefaultTimeperiod)
+@Include(DefaultTimeperiod)
 export class Localhost extends HostObj {
+  check: Check = new Ping('localhost');
+  contacts: Array<ContactObj|ContactGroupObj> = [ DefaultContact ];
 
-  get check(): Check {
-    return new Ping('There is no place like 127.0.0.1');
-  }
-
-  get contacts(): Array<ContactObj|ContactGroupObj> {
-    return [
-      DefaultContact
-    ];
-  }
-
-  get services(): Array<ServiceObj> {
-    return [
-      new PingService('Ping')
-    ];
-  }
-
+  services: Array<ServiceObj> = [
+    new PingService('Ping'),
+    new RootPartitionService('Local disk')
+  ];
 }
 
 export default new Localhost();

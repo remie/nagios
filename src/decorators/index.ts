@@ -7,5 +7,5 @@ export { Nagios } from './nagios';
 export { Service } from './service';
 export { ServiceGroup } from './servicegroup';
 export { Timeperiod } from './timeperiod';
-export { Ref } from './ref';
+export { Include } from './include';
 export { Use } from './use';

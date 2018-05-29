@@ -1,7 +1,7 @@
 
 export { ObjectDefinition, InheritableObjectDefinition } from './ObjectDefinition';
 export { Cgi } from './cgi';
-export { Check } from './check';
+export { Check, CheckResult, NagiosResult } from './check';
 export { ContactGroup } from './contactgroup';
 export { Contact } from './contacts';
 export { HostGroup } from './hostgroup';

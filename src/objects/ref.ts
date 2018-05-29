@@ -1,15 +1,13 @@
 
-import { AbstractNagiosObj, NagiosObj, InheritableNagiosObj } from './index';
+import { AbstractNagiosObj, NagiosObj, InheritableNagiosObj, ObjectType } from './index';
 
 export class RefObj extends AbstractNagiosObj {
   type: ObjectType;
   instance: NagiosObj|InheritableNagiosObj;
 
-  constructor(type: ObjectType, instance: NagiosObj|InheritableNagiosObj) {
+  constructor(instance: NagiosObj|InheritableNagiosObj) {
     super();
-    this.type = type;
+    this.type = instance.objectType;
     this.instance = instance;
   }
 }
-
-export type ObjectType = 'contact'|'contactgroup'|'host'|'hostgroup'|'nagios'|'service'|'servicegroup'|'timeperiod';

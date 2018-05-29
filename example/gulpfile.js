@@ -39,7 +39,7 @@ gulp.task('lint', ['clean'], () =>
 );
 
 gulp.task('assets', ['clean'], () => 
-	gulp.src(['./src/**/*.json'])
+	gulp.src(['./src/**/*.json', './src/htpasswd.users'])
 		.pipe(gulp.dest('./build'))
 );
 

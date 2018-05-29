@@ -67,20 +67,21 @@ program.command('execute [identifier]')
           const entryPoint = Compiler.getEntryPoint(options.file);
 
           if (!entryPoint) {
-            console.log();
-            console.log('Error: could not find Nagios configuration entry point');
-            console.log('Either specify --file option, or set the "main" property in package.json');
-            program.outputHelp();
-            console.log();
+            console.log('Error: no Nagios configuration entry point provided');
+            process.exit(3);
           } else {
             const cmd = eval(`entryPoint.nagios.${identifier}`);
             if (cmd) { 
-              cmd.execute();
+              cmd.execute().then((result) => {
+                console.log(result.message);
+                process.exit(result.code);
+              }).catch((error) => {
+                console.log(error.toString());
+                process.exit(3);
+              })
             } else {
-              console.log();
-              console.log('Error: could not find specified command in Nagios configuration');
-              program.outputHelp();
-              console.log();
+              console.log('Error: could not find Nagios configuration entry point');
+              process.exit(3);
             }
           }
        });

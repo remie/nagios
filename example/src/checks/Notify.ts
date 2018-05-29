@@ -1,5 +1,5 @@
 
-import { Check } from '@remie/nagios-cli';
+import { Check, CheckResult, NagiosResult } from '@remie/nagios-cli';
 
 export default class Notify implements Check {
 
@@ -9,7 +9,10 @@ export default class Notify implements Check {
     this.text = text;
   }
 
-  execute() {
-    console.log(this.text);
+  async execute(): Promise<CheckResult> {
+    return {
+      message: this.text,
+      code: NagiosResult.OK
+    };
   }
 }
