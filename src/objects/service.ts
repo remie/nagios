@@ -6,6 +6,11 @@ export abstract class ServiceObj extends AbstractInheritableNagiosObj {
   objectType = ObjectType.service;
   configuration: Service;
 
+  constructor(description?: string) {
+    super();
+    this.configuration.service_description = description;
+  }
+
   contacts(): Array<ContactObj|ContactGroupObj> {
     return null;
   }

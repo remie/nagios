@@ -1,6 +1,7 @@
 
 import { Host, HostObj, ServiceObj, ContactObj, ContactGroupObj, Include, Check } from '@remie/nagios-cli';
-import { PingService, RootPartitionService } from '../services';
+import { SiCheckType } from '../checks';
+import { CheckLoadService, CheckDiskService, CheckProcessesService, CheckSwapService, CheckUsersService, PingService, SSHService, HTTPService } from '../services';
 import DefaultContact from '../contacts/DefaultContact';
 import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
 import { Ping } from '../checks';
@@ -25,8 +26,14 @@ export class Localhost extends HostObj {
   contacts: Array<ContactObj|ContactGroupObj> = [ DefaultContact ];
 
   services: Array<ServiceObj> = [
-    new PingService('Ping'),
-    new RootPartitionService('Local disk')
+    new CheckLoadService('Current Load'),
+    new CheckUsersService('Current Users'),
+    new HTTPService('HTTP', `http://${this.configuration.address}`),
+    new PingService('PING', this.configuration.address),
+    new CheckDiskService('Root Partition', '/'),
+    new SSHService('SSH', this.configuration.address),
+    new CheckSwapService('Swap Usage'),
+    new CheckProcessesService('Total Processes')
   ];
 }
 

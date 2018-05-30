@@ -1,10 +1,12 @@
 
 import { default as BaseService } from './BaseService';
 import { Use, ServiceObj, Check } from '@remie/nagios-cli';
-import Ping from '../checks/Ping';
+import HTTP from '../checks/HTTP';
 
-@Use(BaseService)
-export class PingService extends ServiceObj {
+@Use(BaseService, {
+  notifications_enabled: false
+})
+export class HTTPService extends ServiceObj {
   private address: string;
 
   constructor(description: string, address: string) {
@@ -13,6 +15,6 @@ export class PingService extends ServiceObj {
   }
 
   get check_command(): Check {
-    return new Ping(this.address);
+    return new HTTP(this.address);
   }
 }

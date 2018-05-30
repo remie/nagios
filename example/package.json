@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/systeminformation": "^3.23.0",
+    "axios": "^0.18.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^2.6.4",
@@ -22,7 +23,9 @@
   },
   "dependencies": {
     "@remie/nagios-cli": "latest",
+    "filesize": "^3.6.1",
     "ping": "^0.2.2",
+    "ssh2": "^0.6.1",
     "systeminformation": "^3.41.3"
   }
 }

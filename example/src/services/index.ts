@@ -1,3 +1,5 @@
 
 export { PingService } from './PingService';
-export { RootPartitionService } from './RootPartitionService';
+export { CheckDiskService, CheckLoadService, CheckProcessesService, CheckSwapService, CheckUsersService } from './CheckLocalSystemService';
+export { SSHService } from './SSHService';
+export { HTTPService } from './HTTPService';
