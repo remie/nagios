@@ -180,7 +180,7 @@ export default class Compiler {
 
   async prepareServices(): Promise<void> {
     this.services = this.services.map((service: ServiceObj) => {
-      service.configuration.name = service.configuration.name || slugify(service.configuration.host_name + '-' + service.configuration.service_description, { lower: true, remove: /[$*_+~.,()'"!\-:@&]/g });
+      service.configuration.name = service.configuration.name || slugify(`${service.configuration.host_name}-${service.configuration.service_description}`, { lower: true, remove: /[$*_+~.,()'"!\:@&]/g });
       return service;
     });
     this.services = this.dedupe('name', this.services) as Array<ServiceObj>;
