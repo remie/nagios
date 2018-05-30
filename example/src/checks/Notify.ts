@@ -1,7 +1,7 @@
 
 import { Check, CheckResult, NagiosResult } from '@remie/nagios-cli';
 
-export default class Notify implements Check {
+export class Notify implements Check {
 
   private text;
 

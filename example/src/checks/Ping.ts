@@ -2,7 +2,7 @@
 import { Check, CheckResult, NagiosResult } from '@remie/nagios-cli';
 import * as ping from 'ping';
 
-export default class Ping implements Check {
+export class Ping implements Check {
   private host: string;
 
   constructor(host: string) {

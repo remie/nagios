@@ -3,26 +3,26 @@ import { Check, CheckResult, NagiosResult } from '@remie/nagios-cli';
 import * as si from 'systeminformation';
 import * as filesize from 'filesize';
 
-export default class CheckLocalSystem implements Check {
-  private _type: SiCheckType;
-  private _options: SiCheckOptions;
+export class SI implements Check {
+  private _type: SIType;
+  private _options: SIOptions;
 
-  constructor(type: SiCheckType, options?: SiCheckOptions) {
+  constructor(type: SIType, options?: SIOptions) {
     this._type = type;
     this._options = options;
   }
 
   async execute(): Promise<CheckResult> {
     switch (this._type) {
-      case SiCheckType.Load:
+      case SIType.Load:
         return this.checkLoad();
-      case SiCheckType.Disk:
+      case SIType.Disk:
         return this.checkDisk();
-      case SiCheckType.Swap:
+      case SIType.Swap:
         return this.checkSwap();
-      case SiCheckType.Processes:
+      case SIType.Processes:
         return this.checkProcesses();
-      case SiCheckType.Users:
+      case SIType.Users:
         return this.checkUsers();
     }
   }
@@ -36,7 +36,7 @@ export default class CheckLocalSystem implements Check {
   }
 
   private async checkDisk(): Promise<CheckResult> {
-    const options = <SiDiskOptions>this._options;
+    const options = <SIDiskOptions>this._options;
     const devices: Array<si.Systeminformation.BlockDevicesData> = await si.blockDevices();
     devices.filter((device) => device.mount === options.mountpoint);
     const device: si.Systeminformation.BlockDevicesData = devices.length > 0 ? devices[0] : null;
@@ -78,7 +78,7 @@ export default class CheckLocalSystem implements Check {
 
 }
 
-export enum SiCheckType {
+export enum SIType {
   Load,
   Disk,
   Swap,
@@ -86,11 +86,11 @@ export enum SiCheckType {
   Users
 }
 
-export interface SiCheckOptions {}
-export interface SiLoadOptions extends SiCheckOptions {}
-export interface SiDiskOptions extends SiCheckOptions {
+export interface SIOptions {}
+export interface SILoadOptions extends SIOptions {}
+export interface SIDiskOptions extends SIOptions {
   mountpoint: string;
 }
-export interface SiSwapOptions extends SiCheckOptions {}
-export interface SiProcessOptions extends SiCheckOptions {}
-export interface SiUsersOptions extends SiCheckOptions {}
+export interface SISwapOptions extends SIOptions {}
+export interface SIProcessOptions extends SIOptions {}
+export interface SIUsersOptions extends SIOptions {}

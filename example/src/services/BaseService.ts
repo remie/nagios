@@ -1,6 +1,6 @@
 
 import { Service, ServiceObj } from '@remie/nagios-cli';
-import Ping from '../checks/Ping';
+import { Ping } from '../checks';
 
 @Service({
   name: 'generic-service',

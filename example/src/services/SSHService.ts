@@ -1,7 +1,7 @@
 
-import { default as BaseService } from './BaseService';
+import BaseService from './BaseService';
 import { Use, ServiceObj, Check } from '@remie/nagios-cli';
-import SSH from '../checks/SSH';
+import { SSH } from '../checks';
 
 @Use(BaseService, {
   notifications_enabled: false

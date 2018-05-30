@@ -1,7 +1,7 @@
 
-import { default as BaseService } from './BaseService';
+import BaseService from './BaseService';
 import { Use, ServiceObj, Check } from '@remie/nagios-cli';
-import Ping from '../checks/Ping';
+import { Ping } from '../checks';
 
 @Use(BaseService)
 export class PingService extends ServiceObj {

@@ -2,7 +2,7 @@
 import { Check, CheckResult, NagiosResult } from '@remie/nagios-cli';
 import axios from 'axios';
 
-export default class HTTP implements Check {
+export class HTTP implements Check {
   private host: string;
 
   constructor(host: string) {

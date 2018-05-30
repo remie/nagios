@@ -1,10 +1,9 @@
 
 import { Host, HostObj, ServiceObj, ContactObj, ContactGroupObj, Include, Check } from '@remie/nagios-cli';
-import { SiCheckType } from '../checks';
-import { CheckLoadService, CheckDiskService, CheckProcessesService, CheckSwapService, CheckUsersService, PingService, SSHService, HTTPService } from '../services';
+import { SIDiskService, SILoadService, SIProcessesService, SISwapService, SIUsersService, PingService, SSHService, HTTPService } from '../services';
+import { Ping, SIType } from '../checks';
 import DefaultContact from '../contacts/DefaultContact';
 import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
-import { Ping } from '../checks';
 
 @Host({
   host_name: 'localhost',
@@ -22,18 +21,18 @@ import { Ping } from '../checks';
 })
 @Include(DefaultTimeperiod)
 export class Localhost extends HostObj {
-  check: Check = new Ping('localhost');
+  check: Check = new Ping(this.configuration.address);
   contacts: Array<ContactObj|ContactGroupObj> = [ DefaultContact ];
 
   services: Array<ServiceObj> = [
-    new CheckLoadService('Current Load'),
-    new CheckUsersService('Current Users'),
+    new SILoadService('Current Load'),
+    new SIUsersService('Current Users'),
     new HTTPService('HTTP', `http://${this.configuration.address}`),
     new PingService('PING', this.configuration.address),
-    new CheckDiskService('Root Partition', '/'),
+    new SIDiskService('Root Partition', '/'),
     new SSHService('SSH', this.configuration.address),
-    new CheckSwapService('Swap Usage'),
-    new CheckProcessesService('Total Processes')
+    new SISwapService('Swap Usage'),
+    new SIProcessesService('Total Processes')
   ];
 }
 

@@ -2,7 +2,7 @@
 import { Check, CheckResult, NagiosResult } from '@remie/nagios-cli';
 import { Client } from 'ssh2';
 
-export default class SSH implements Check {
+export class SSH implements Check {
   private host: string;
   private port: number;
 

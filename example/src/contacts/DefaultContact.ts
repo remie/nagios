@@ -1,11 +1,11 @@
 
-import { default as DefaultTimeperiod } from '../timeperiods/DefaultTimeperiod';
-import { default as Notify } from '../checks/Notify';
+import { Notify } from '../checks/';
 import { Contact, ContactObj, Include, Check, ObjectType, NagiosObj } from '@remie/nagios-cli';
+import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
 
 @Contact({
-  contact_name: 'rbolte',
-  alias: 'Remie Bolte',
+  contact_name: 'nagiosadmin',
+  alias: 'Nagios Administrator',
   service_notification_period: '24x7',
   host_notification_period: '24x7'
 })

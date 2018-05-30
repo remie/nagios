@@ -1,5 +1,5 @@
 
-export { PingService } from './PingService';
-export { CheckDiskService, CheckLoadService, CheckProcessesService, CheckSwapService, CheckUsersService } from './CheckLocalSystemService';
-export { SSHService } from './SSHService';
 export { HTTPService } from './HTTPService';
+export { PingService } from './PingService';
+export { SIDiskService, SILoadService, SIProcessesService, SISwapService, SIUsersService } from './SIService';
+export { SSHService } from './SSHService';
