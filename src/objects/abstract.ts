@@ -37,6 +37,10 @@ export abstract class AbstractInheritableNagiosObj extends AbstractNagiosObj imp
   }
 }
 
+export interface ExtendableNagiosObj {
+  [key: string]: any;
+}
+
 export enum ObjectType {
   contact = 'contact',
   contactgroup = 'contactgroup',
