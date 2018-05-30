@@ -4,6 +4,7 @@
   "description": "",
   "main": "./build/index.js",
   "scripts": {
+    "start": "docker build -t nagios-example . && docker run --rm -it --name nagios-example -p 8000:80 nagios-example",
     "build": "./node_modules/.bin/gulp build",
     "compile": "npm run build && ./node_modules/.bin/nagios-cli compile -f ./build/index.js",
     "test": "./test.sh"
