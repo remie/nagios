@@ -8,14 +8,4 @@ export abstract class HostObj extends AbstractInheritableNagiosObj {
 
   abstract get services(): Array<ServiceObj>;
   abstract get contacts(): Array<ContactObj|ContactGroupObj>;
-
-  get hostgroups(): Array<HostGroupObj> {
-    return [];
-  }
-
-  get check(): Check {
-    return null;
-  }
-
-
 }
