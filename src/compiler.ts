@@ -62,9 +62,12 @@ export default class Compiler {
     this.hostgroups.forEach((hostgroup: HostGroupObj) => this.hosts.push(...hostgroup.hosts));
 
     // Collect services
-    this.nagios.hosts.forEach((host: HostObj) => {
-      host.services.forEach((service: ServiceObj) => {
+    this.nagios.hosts.forEach((host: HostObj, hostIndex: number) => {
+      host.services.forEach((service: ServiceObj, serviceIndex: number) => {
         service.configuration.host_name = host.configuration.host_name;
+        if (!service.configuration.check_command || service.configuration.check_command === '') {
+          service.configuration.check_command = `nagios-cli!hosts[${hostIndex}].services[${serviceIndex}].check_command`;
+        }
         this.services.push(service);
       });
     });
@@ -183,9 +186,6 @@ export default class Compiler {
     this.services = this.dedupe('name', this.services) as Array<ServiceObj>;
 
     this.services.forEach((service: ServiceObj, index: number) => {
-      if (!service.configuration.check_command || service.configuration.check_command === '') {
-        service.configuration.check_command = `nagios-cli!hosts[${index}].check`;
-      }
       this.registerCfgFile(`services/${service.configuration.name}.cfg`);
     });
   }
