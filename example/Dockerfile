@@ -10,12 +10,9 @@ RUN yum -y install nodejs
 ## Set workdir
 WORKDIR /opt/nagios/
 
-## Install Nagios CLI
-RUN npm install -g @remie/nagios-cli@latest
-
 ## Copy & install Nagios configuration
 COPY package.json package-lock.json ./
-RUN npm install && npm install @remie/nagios-cli@latest
+RUN npm install
 
 ## Copy sources
 COPY ./src ./src

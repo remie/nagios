@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## Install Nagios CLI
+npm install -g @remie/nagios-cli@latest
+
 ## Compile Nagios configuration
 npm run compile
 
