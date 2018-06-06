@@ -5,11 +5,13 @@
 import del from 'del';
 import * as path from 'path';
 import * as fs from 'fs-extra';
+import * as cloneDeep from 'lodash.clonedeep';
+import slugify from 'slugify';
+
 import { ExtendableNagiosObj } from './objects/abstract';
 import { Timeperiod, Contact, ContactGroup } from './types';
 import { RefObj, ObjectType, ContactObj, ContactGroupObj, HostObj, HostGroupObj, NagiosCfg, NagiosObj, InheritableNagiosObj, ServiceObj, ServiceGroupObj, TimeperiodObj } from './objects';
 import CommandObj from './objects/command';
-import slugify from 'slugify';
 
 // ------------------------------------------------------------------------------------------ Module exports
 
@@ -64,14 +66,14 @@ export default class Compiler {
     // Collect services
     this.nagios.hosts.forEach((host: HostObj, hostIndex: number) => {
       host.services.forEach((service: ServiceObj, serviceIndex: number) => {
-        // We need a deep clone to enable inheritance, using JSON because this is a CLI and performance is less problematic :P
-        const hostService = JSON.parse(JSON.stringify(service));
+        // We need a deep clone to enable inheritance
+        const hostService = cloneDeep(service);
         hostService.configuration.host_name = host.configuration.host_name;
         hostService.configuration.name = slugify(`${hostService.configuration.host_name}-${hostService.configuration.service_description}`, { lower: true, remove: /[$*_+~.,()'"!\:@&]/g });
         if (!hostService.configuration.check_command || hostService.configuration.check_command === '') {
           hostService.configuration.check_command = `nagios-cli!hosts[${hostIndex}].services[${serviceIndex}].check_command`;
         }
-        this.services.push(Object.assign({}, hostService));
+        this.services.push(hostService);
       });
     });
 
