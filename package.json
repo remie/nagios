@@ -1,6 +1,6 @@
 {
   "name": "@remie/nagios-cli",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Nagios Core + Docker + TypeScript = 🤔😊😍",
   "dependencies": {
     "commander": "^2.11.0",
