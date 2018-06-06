@@ -8,7 +8,9 @@ export abstract class ServiceObj extends AbstractInheritableNagiosObj {
 
   constructor(description?: string) {
     super();
-    this.configuration.service_description = description;
+    if (description) {
+      this.configuration.service_description = description;
+    }
   }
 
   contacts(): Array<ContactObj|ContactGroupObj> {
