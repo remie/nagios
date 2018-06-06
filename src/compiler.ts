@@ -64,11 +64,14 @@ export default class Compiler {
     // Collect services
     this.nagios.hosts.forEach((host: HostObj, hostIndex: number) => {
       host.services.forEach((service: ServiceObj, serviceIndex: number) => {
-        service.configuration.host_name = host.configuration.host_name;
-        if (!service.configuration.check_command || service.configuration.check_command === '') {
-          service.configuration.check_command = `nagios-cli!hosts[${hostIndex}].services[${serviceIndex}].check_command`;
+        // We need a deep clone to enable inheritance, using JSON because this is a CLI and performance is less problematic :P
+        const hostService = JSON.parse(JSON.stringify(service));
+        hostService.configuration.host_name = host.configuration.host_name;
+        hostService.configuration.name = slugify(`${hostService.configuration.host_name}-${hostService.configuration.service_description}`, { lower: true, remove: /[$*_+~.,()'"!\:@&]/g });
+        if (!hostService.configuration.check_command || hostService.configuration.check_command === '') {
+          hostService.configuration.check_command = `nagios-cli!hosts[${hostIndex}].services[${serviceIndex}].check_command`;
         }
-        this.services.push(service);
+        this.services.push(Object.assign({}, hostService));
       });
     });
 
@@ -190,10 +193,6 @@ export default class Compiler {
   }
 
   async prepareServices(): Promise<void> {
-    this.services = this.services.map((service: ServiceObj) => {
-      service.configuration.name = service.configuration.name || slugify(`${service.configuration.host_name}-${service.configuration.service_description}`, { lower: true, remove: /[$*_+~.,()'"!\:@&]/g });
-      return service;
-    });
     this.services = this.dedupe('name', this.services) as Array<ServiceObj>;
 
     this.services.forEach((service: ServiceObj, index: number) => {
