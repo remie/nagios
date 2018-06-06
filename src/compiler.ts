@@ -78,9 +78,34 @@ export default class Compiler {
     });
 
     // Collect contacts (from hosts, services, contactgroups)
-    this.nagios.hosts.forEach((host: HostObj) => {
-      host.contacts.filter((contact: ContactObj|ContactGroupObj) => (contact instanceof ContactObj))
-        .forEach((contact: ContactObj) => this.contacts.push(contact));
+    this.nagios.hosts.forEach((host: HostObj, hostIndex: number) => {
+      host.contacts.forEach((contact: ContactObj|ContactGroupObj, contactIndex: number) => {
+        if (contact instanceof ContactObj) {
+          const hostContact = cloneDeep(contact);
+          if (!hostContact.configuration.service_notification_commands || hostContact.configuration.service_notification_commands === '') {
+            hostContact.configuration.service_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].serviceNotificationCommand`;
+          }
+
+          if (!hostContact.configuration.host_notification_commands || hostContact.configuration.host_notification_commands === '') {
+            hostContact.configuration.host_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].hostNotificationCommand`;
+          }
+
+          this.contacts.push(hostContact);
+        } else if (contact instanceof ContactGroupObj) {
+          contact.members.forEach((contact: ContactObj, memberIndex: number) => {
+            const hostContact = cloneDeep(contact);
+            if (!hostContact.configuration.service_notification_commands || hostContact.configuration.service_notification_commands === '') {
+              hostContact.configuration.service_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].members[${memberIndex}].serviceNotificationCommand`;
+            }
+
+            if (!hostContact.configuration.host_notification_commands || hostContact.configuration.host_notification_commands === '') {
+              hostContact.configuration.host_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].members[${memberIndex}].hostNotificationCommand`;
+            }
+
+            this.contacts.push(hostContact);
+          });
+        }
+      });
       host.contacts.filter((contact: ContactObj|ContactGroupObj) => (contact instanceof ContactGroupObj))
         .forEach((contact: ContactGroupObj) => contact.members.filter((member: ContactObj|ContactGroupObj) => (member instanceof ContactObj))
           .forEach((member: ContactObj) => this.contacts.push(member)));
@@ -137,15 +162,6 @@ export default class Compiler {
 
     // Add the definition to the Nagios CFG
     this.contacts.forEach((contact: ContactObj, index: number) => {
-
-      if (!contact.configuration.service_notification_commands || contact.configuration.service_notification_commands === '') {
-        contact.configuration.service_notification_commands = `nagios-cli!hosts[${index}].serviceNotificationCommand`;
-      }
-
-      if (!contact.configuration.host_notification_commands || contact.configuration.host_notification_commands === '') {
-        contact.configuration.host_notification_commands = `nagios-cli!hosts[${index}].hostNotificationCommand`;
-      }
-
       const filename = `${contact.configuration.contact_name}.cfg`;
       this.registerCfgFile(`contacts/${filename}`);
     });
