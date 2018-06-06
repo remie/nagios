@@ -156,7 +156,6 @@ export default class Compiler {
   }
 
   async prepareHosts(): Promise<void> {
-    this.hosts = this.nagios.hosts.slice();
     this.hosts = this.dedupe('host_name', this.hosts) as Array<HostObj>;
 
     // Add the definition to the Nagios CFG
