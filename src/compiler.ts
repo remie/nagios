@@ -83,10 +83,13 @@ export default class Compiler {
 
     // Gather references from objects
     this.refs = this.refs.concat(...this.nagios.refs);
-    this.refs = this.refs.concat(...this.contacts.filter((contact: ContactObj) => contact.refs).map((contact: ContactObj) => contact.refs));
-    this.refs = this.refs.concat(...this.hosts.filter((host: HostObj) => host.refs).map((host: HostObj) => host.refs));
-    this.refs = this.refs.concat(...this.hostgroups.filter((hostGroup: HostGroupObj) => hostGroup.refs).map((hostGroup: HostGroupObj) => hostGroup.refs || null));
-    this.refs = this.refs.concat(...this.services.filter((service: ServiceObj) => service.refs).map((service: ServiceObj) => service.refs || null));
+    this.refs = this.refs.concat(...this.contactgroups.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
+    this.refs = this.refs.concat(...this.contacts.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
+    this.refs = this.refs.concat(...this.hostgroups.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
+    this.refs = this.refs.concat(...this.hosts.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
+    this.refs = this.refs.concat(...this.servicegroups.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
+    this.refs = this.refs.concat(...this.services.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
+    this.refs = this.refs.concat(...this.timeperiods.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
 
     // Process object references
     this.refs.forEach((obj: RefObj) => {
@@ -96,6 +99,15 @@ export default class Compiler {
           break;
         case 'contactgroup':
           this.contactgroups.push(<ContactGroupObj>obj.instance);
+          break;
+        case 'hostgroup':
+          this.hostgroups.push(<HostGroupObj>obj.instance);
+          break;
+        case 'host':
+          this.hosts.push(<HostObj>obj.instance);
+          break;
+        case 'servicegroup':
+          this.servicegroups.push(<ServiceGroupObj>obj.instance);
           break;
         case 'service':
           this.services.push(<ServiceObj>obj.instance);
