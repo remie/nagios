@@ -1,5 +1,6 @@
 
 import { ObjectDefinition, InheritableObjectDefinition } from '../types/';
+import * as cloneDeep from 'lodash.clonedeep';
 
 export type NagiosClass<T> = { new (...args: any[]): T & NagiosObj } & NagiosObj;
 export type InheritableNagiosClass<T> = { new (...args: any[]): T & InheritableNagiosObj } & InheritableNagiosObj;
@@ -16,7 +17,7 @@ export abstract class AbstractNagiosObj implements NagiosObj {
   refs?: Array<NagiosObj>;
 
   constructor() {
-    this.configuration = this.configuration || {};
+    this.configuration = Object.assign({}, cloneDeep(this.configuration || {}), cloneDeep((<any>this)._decorator || {}));
   }
 }
 
