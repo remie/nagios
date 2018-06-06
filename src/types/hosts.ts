@@ -6,7 +6,7 @@ export interface Host extends InheritableObjectDefinition {
   host_name: string;
   alias?: string;
   display_name?: string;
-  address: string;
+  address?: string;
   parents?: string;
   hostgroups?: string;
   check_command?: string;
