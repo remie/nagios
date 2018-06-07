@@ -72,7 +72,7 @@ program.command('execute [identifier]')
           } else {
             const cmd = eval(`entryPoint.nagios.${identifier}`);
             if (cmd) { 
-              cmd.execute().then((result) => {
+              cmd.execute(process.env).then((result) => {
                 console.log(result.message);
                 process.exit(result.code);
               }).catch((error) => {

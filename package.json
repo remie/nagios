@@ -21,7 +21,7 @@
     "nagios-cli": "./bin/nagios-cli"
   },
   "devDependencies": {
-    "@types/node": "^9.6.5",
+    "@types/node": "^9.6.20",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^2.6.4",

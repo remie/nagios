@@ -1,6 +1,6 @@
 
 export interface Check {
-  execute(): Promise<CheckResult>;
+  execute(args?: NodeJS.ProcessEnv): Promise<CheckResult>;
 }
 
 export interface CheckResult {
