@@ -8,6 +8,6 @@ export abstract class NagiosCfg extends AbstractNagiosObj {
   cgi?: Cgi;
   resource?: Resource;
 
-  abstract get hosts(): Array<HostObj>;
-
+  hosts: Array<HostObj> = [];
+  hostgroups: Array<HostGroupObj> = [];
 }

@@ -42,7 +42,7 @@ export default class Compiler {
     await this.prepareCommands();
     await this.prepareContacts();
     // await this.prepareContactGroups();
-    // await this.prepareHostGroups();
+    await this.prepareHostGroups();
     await this.prepareHosts();
     await this.prepareServices();
     await this.prepareTimeperiods();
@@ -61,7 +61,7 @@ export default class Compiler {
 
     // Collect hosts
     this.nagios.hosts.forEach((host: HostObj) => this.hosts.push(host));
-    this.hostgroups.forEach((hostgroup: HostGroupObj) => this.hosts.push(...hostgroup.hosts));
+    this.hostgroups.forEach((hostgroup: HostGroupObj) => this.hosts.push(...hostgroup.members));
 
     // Collect services
     this.nagios.hosts.forEach((host: HostObj, hostIndex: number) => {
@@ -174,6 +174,16 @@ export default class Compiler {
   }
 
   async prepareHostGroups(): Promise<void> {
+    this.hostgroups = this.dedupe('hostgroup_name', this.hostgroups) as Array<HostGroupObj>;
+
+    this.hostgroups.forEach((hostgroup: HostGroupObj) => {
+      if (!hostgroup.configuration.members || hostgroup.configuration.members === '') {
+        hostgroup.configuration.members = hostgroup.members.map((host: HostObj) => host.configuration.host_name).join(',');
+      }
+
+      const filename = `${hostgroup.configuration.hostgroup_name}.cfg`;
+      this.registerCfgFile(`hostgroups/${filename}`);
+    });
   }
 
   async prepareHosts(): Promise<void> {
