@@ -43,7 +43,7 @@ export default class Compiler {
     const nagiosCommand = new NagiosCommand();
     const binPath = path.resolve(path.join(process.cwd(), './node_modules/.bin/nagios-cli'));
     nagiosCommand.command_name = 'nagios-cli';
-    nagiosCommand.command_line = `/usr/bin/env node ${binPath} execute -f ${this.filepath} $ARG1$`;
+    nagiosCommand.command_line = `/usr/bin/env node ${binPath} execute -f ${this.filepath} "$ARG1$"`;
     objects.commands.set('nagios-cli', nagiosCommand);
 
     // Add all the objects to the cfg_file property in Nagios CFG
