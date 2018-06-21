@@ -82,7 +82,7 @@ program.command('execute [identifier]')
                 process.exit(3);
               })
             } else {
-              console.log('Error: could not find Nagios configuration entry point');
+              console.log('Error: provided command identifier is invalid');
               process.exit(3);
             }
           }

@@ -66,11 +66,11 @@ export abstract class HostObj extends AbstractInheritableNagiosObj {
     const definition = super.toObjectDefinition() as Host;
     delete definition['services'];
 
-    if (!definition.check_command || typeof definition.check_command !== 'string') {
+    if (definition.check_command && typeof definition.check_command !== 'string') {
       definition.check_command = `nagios-cli!hosts.get('${definition.host_name}').check_command`;
     }
 
-    if (!definition.event_handler || typeof definition.event_handler !== 'string') {
+    if (definition.event_handler && typeof definition.event_handler !== 'string') {
       definition.event_handler = `nagios-cli!hosts.get('${definition.host_name}').event_handler`;
     }
 

@@ -36,10 +36,10 @@ export abstract class ContactObj extends AbstractInheritableNagiosObj {
 
   toObjectDefinition(): Contact {
     const definition = super.toObjectDefinition() as Contact;
-    if (!definition.host_notification_commands || typeof definition.host_notification_commands !== 'string') {
+    if (definition.host_notification_commands && typeof definition.host_notification_commands !== 'string') {
       definition.host_notification_commands = `nagios-cli!contacts.get('${definition.contact_name}').host_notification_commands`;
     }
-    if (!definition.service_notification_commands || typeof definition.service_notification_commands !== 'string') {
+    if (definition.service_notification_commands && typeof definition.service_notification_commands !== 'string') {
       definition.service_notification_commands = `nagios-cli!contacts.get('${definition.contact_name}').service_notification_commands`;
     }
     return definition;

@@ -62,11 +62,11 @@ export abstract class ServiceObj extends AbstractInheritableNagiosObj {
   toObjectDefinition(): Service {
     const definition = super.toObjectDefinition() as Service;
 
-    if (!definition.check_command || typeof definition.check_command !== 'string') {
+    if (definition.check_command && typeof definition.check_command !== 'string') {
       definition.check_command = `nagios-cli!services.get('${definition.name}').check_command`;
     }
 
-    if (!definition.event_handler || typeof definition.event_handler !== 'string') {
+    if (definition.event_handler && typeof definition.event_handler !== 'string') {
       definition.event_handler = `nagios-cli!services.get('${definition.name}').event_handler`;
     }
 
