@@ -2,12 +2,12 @@
 export { ObjectDefinition, InheritableObjectDefinition } from './ObjectDefinition';
 export { Cgi } from './cgi';
 export { Check, CheckResult, NagiosResult } from './check';
+export { Contact } from './contact';
 export { ContactGroup } from './contactgroup';
-export { Contact } from './contacts';
+export { Host } from './host';
 export { HostGroup } from './hostgroup';
-export { Host } from './hosts';
 export { Nagios } from './nagios';
 export { Resource } from './resources';
+export { Service } from './service';
 export { ServiceGroup } from './servicegroup';
-export { Service } from './services';
 export { Timeperiod } from './timeperiod';

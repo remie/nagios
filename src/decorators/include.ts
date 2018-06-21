@@ -4,8 +4,8 @@ import { NagiosClass, NagiosObj, InheritableNagiosObj, RefObj, ObjectType } from
 
 export function Include(ref: NagiosObj|InheritableNagiosObj) {
   return function (constructor: NagiosClass<NagiosObj|InheritableNagiosObj>): any {
-    constructor.prototype.refs = constructor.prototype.refs || [];
-    constructor.prototype.refs.push(new RefObj(ref));
+    constructor.prototype._references = constructor.prototype._references || [];
+    constructor.prototype._references.push(new RefObj(ref));
     return constructor;
   };
 }

@@ -62,15 +62,17 @@ program.command('execute [identifier]')
        .description('Run the command for the specified service')
        .option('-f, --file <path>',  'Entry point for generating Nagios configuration, defaults to "main" property of package.json')
        .option('-c, --command <identifier>',  'The identifier for the service command to be executed')
-       .action(function(identifier, options) {
+       .action(async function(identifier, options) {
           identifier = identifier || options.command;
           const entryPoint = Compiler.getEntryPoint(options.file);
+          const compiler = new Compiler(entryPoint);
+          const objects = await compiler.collect();
 
           if (!entryPoint) {
             console.log('Error: no Nagios configuration entry point provided');
             process.exit(3);
           } else {
-            const cmd = eval(`entryPoint.nagios.${identifier}`);
+            const cmd = eval(`objects.${identifier}`);
             if (cmd) { 
               cmd.execute(process.env).then((result) => {
                 console.log(result.message);

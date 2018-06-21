@@ -8,10 +8,12 @@ import * as fs from 'fs-extra';
 import * as cloneDeep from 'lodash.clonedeep';
 import slugify from 'slugify';
 
-import { ExtendableNagiosObj } from './objects/abstract';
-import { Timeperiod, Contact, ContactGroup } from './types';
-import { RefObj, ObjectType, ContactObj, ContactGroupObj, HostObj, HostGroupObj, NagiosCfg, NagiosObj, InheritableNagiosObj, ServiceObj, ServiceGroupObj, TimeperiodObj } from './objects';
-import CommandObj from './objects/command';
+import { Nagios, Timeperiod, Contact, ContactGroup } from './types';
+import { RefObj, ObjectType, ContactObj, ContactGroupObj, HostObj, HostGroupObj, NagiosCfg, NagiosObj, InheritableNagiosObj, ServiceObj, ServiceGroupObj, TimeperiodObj, AbstractNagiosObj } from './objects';
+import { NagiosCommand } from './lib/NagiosCommand';
+import { CommandObj } from './objects/command';
+
+import { Collector, CollectedObjects } from './lib/Collector';
 
 // ------------------------------------------------------------------------------------------ Module exports
 
@@ -20,16 +22,7 @@ export default class Compiler {
   private outputDir: string;
   private filepath: string;
 
-  private commands: Array<NagiosObj> = [];
-  private contacts: Array<ContactObj> = [];
-  private contactgroups: Array<ContactGroupObj> = [];
-  private hosts: Array<HostObj> = [];
-  private hostgroups: Array<HostGroupObj> = [];
   private nagios: NagiosCfg;
-  private refs: Array<NagiosObj> = [];
-  private services: Array<ServiceObj> = [];
-  private servicegroups: Array<ServiceGroupObj> = [];
-  private timeperiods: Array<TimeperiodObj> = [];
 
   constructor(entryPoint: EntryPoint, outputDir: string = './config') {
     this.nagios = <NagiosCfg>entryPoint.nagios;
@@ -38,204 +31,35 @@ export default class Compiler {
   }
 
   async compile(): Promise<void> {
-    await this.collect();
-    await this.prepareCommands();
-    await this.prepareContacts();
-    // await this.prepareContactGroups();
-    await this.prepareHostGroups();
-    await this.prepareHosts();
-    await this.prepareServices();
-    await this.prepareTimeperiods();
-    await this.persist();
+    const objects = await this.collect();
+    await this.persist(objects);
   }
 
-  async collect(): Promise<void> {
+  async collect(): Promise<CollectedObjects> {
+    const collector = new Collector(this.nagios);
+    const objects = collector.collect();
 
-    // Collect commands
-    this.commands.push(this.getCommand());
+    // Add the custom Nagios CLI command
+    const nagiosCommand = new NagiosCommand();
+    const binPath = path.resolve(path.join(process.cwd(), './node_modules/.bin/nagios-cli'));
+    nagiosCommand.command_name = 'nagios-cli';
+    nagiosCommand.command_line = `/usr/bin/env node ${binPath} execute -f ${this.filepath} $ARG1$`;
+    objects.commands.set('nagios-cli', nagiosCommand);
 
-    // Collect hostgroups
-    this.nagios.hosts
-      .filter((host: HostObj & ExtendableNagiosObj) => host.hostgroups)
-      .forEach((host: HostObj & ExtendableNagiosObj) => this.hostgroups.push(...host.hostgroups));
+    // Add all the objects to the cfg_file property in Nagios CFG
+    Collector.sortByName(objects.commands).forEach((obj: CommandObj) => this.registerCfgFile(`commands/${obj.command_name}.cfg`));
+    Collector.sortByName(objects.timeperiods).forEach((obj: TimeperiodObj) => this.registerCfgFile(`timeperiods/${obj.timeperiod_name}.cfg`));
+    Collector.sortByName(objects.contacts).forEach((obj: ContactObj) => this.registerCfgFile(`contacts/${obj.contact_name}.cfg`));
+    Collector.sortByName(objects.contactgroups).forEach((obj: ContactGroupObj) => this.registerCfgFile(`contactgroups/${obj.contactgroup_name}.cfg`));
+    Collector.sortByName(objects.hostgroups).forEach((obj: HostGroupObj) => this.registerCfgFile(`hostgroups/${obj.hostgroup_name}.cfg`));
+    Collector.sortByName(objects.hosts).forEach((obj: HostObj) => this.registerCfgFile(`hosts/${obj.host_name}.cfg`));
+    Collector.sortByName(objects.servicegroups).forEach((obj: ServiceGroupObj) => this.registerCfgFile(`servicegroups/${obj.servicegroup_name}.cfg`));
+    Collector.sortByName(objects.services).forEach((obj: ServiceObj) => this.registerCfgFile(`services/${obj.name}.cfg`));
 
-    // Collect hosts
-    this.nagios.hosts.forEach((host: HostObj) => this.hosts.push(host));
-    this.hostgroups.forEach((hostgroup: HostGroupObj) => this.hosts.push(...hostgroup.members));
-
-    // Collect services
-    this.nagios.hosts.forEach((host: HostObj, hostIndex: number) => {
-      host.services.forEach((service: ServiceObj, serviceIndex: number) => {
-        // We need a deep clone to enable inheritance
-        const hostService = cloneDeep(service);
-        hostService.configuration.host_name = host.configuration.host_name;
-        hostService.configuration.name = slugify(`${hostService.configuration.host_name}-${hostService.configuration.service_description}`, { lower: true, remove: /[$*_+~.,()'"!\:@&]/g });
-        if (!hostService.configuration.check_command || hostService.configuration.check_command === '') {
-          hostService.configuration.check_command = `nagios-cli!hosts[${hostIndex}].services[${serviceIndex}].check_command`;
-        }
-        this.services.push(hostService);
-      });
-    });
-
-    // Collect contacts (from hosts, services, contactgroups)
-    this.nagios.hosts.forEach((host: HostObj, hostIndex: number) => {
-      host.contacts.forEach((contact: ContactObj|ContactGroupObj, contactIndex: number) => {
-        if (contact instanceof ContactObj) {
-          const hostContact = cloneDeep(contact);
-          if (!hostContact.configuration.service_notification_commands || hostContact.configuration.service_notification_commands === '') {
-            hostContact.configuration.service_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].serviceNotificationCommand`;
-          }
-
-          if (!hostContact.configuration.host_notification_commands || hostContact.configuration.host_notification_commands === '') {
-            hostContact.configuration.host_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].hostNotificationCommand`;
-          }
-
-          this.contacts.push(hostContact);
-        } else if (contact instanceof ContactGroupObj) {
-          contact.members.forEach((contact: ContactObj, memberIndex: number) => {
-            const hostContact = cloneDeep(contact);
-            if (!hostContact.configuration.service_notification_commands || hostContact.configuration.service_notification_commands === '') {
-              hostContact.configuration.service_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].members[${memberIndex}].serviceNotificationCommand`;
-            }
-
-            if (!hostContact.configuration.host_notification_commands || hostContact.configuration.host_notification_commands === '') {
-              hostContact.configuration.host_notification_commands = `nagios-cli!hosts[${hostIndex}].contacts[${contactIndex}].members[${memberIndex}].hostNotificationCommand`;
-            }
-
-            this.contacts.push(hostContact);
-          });
-        }
-      });
-      host.contacts.filter((contact: ContactObj|ContactGroupObj) => (contact instanceof ContactGroupObj))
-        .forEach((contact: ContactGroupObj) => contact.members.filter((member: ContactObj|ContactGroupObj) => (member instanceof ContactObj))
-          .forEach((member: ContactObj) => this.contacts.push(member)));
-    });
-
-    // Gather references from objects
-    this.refs = this.refs.concat(...this.nagios.refs);
-    this.refs = this.refs.concat(...this.contactgroups.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
-    this.refs = this.refs.concat(...this.contacts.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
-    this.refs = this.refs.concat(...this.hostgroups.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
-    this.refs = this.refs.concat(...this.hosts.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
-    this.refs = this.refs.concat(...this.servicegroups.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
-    this.refs = this.refs.concat(...this.services.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
-    this.refs = this.refs.concat(...this.timeperiods.filter((obj: NagiosObj) => obj.refs).map((obj: NagiosObj) => obj.refs));
-
-    // Process object references
-    this.refs.forEach((obj: RefObj) => {
-      switch (obj.type) {
-        case 'contact':
-          this.contacts.push(<ContactObj>obj.instance);
-          break;
-        case 'contactgroup':
-          this.contactgroups.push(<ContactGroupObj>obj.instance);
-          break;
-        case 'hostgroup':
-          this.hostgroups.push(<HostGroupObj>obj.instance);
-          break;
-        case 'host':
-          this.hosts.push(<HostObj>obj.instance);
-          break;
-        case 'servicegroup':
-          this.servicegroups.push(<ServiceGroupObj>obj.instance);
-          break;
-        case 'service':
-          this.services.push(<ServiceObj>obj.instance);
-          break;
-        case 'timeperiod':
-          this.timeperiods.push(<TimeperiodObj>obj.instance);
-          break;
-      }
-    });
-
+    return objects;
   }
 
-  async prepareCommands(): Promise<void> {
-    this.registerCfgFile('commands/nagios-cli.cfg');
-  }
-
-  /*****************************************************
-  Contacts can only exist on host & service objects
-  ******************************************************/
-  async prepareContacts(): Promise<void> {
-    this.contacts = this.dedupe('contact_name', this.contacts) as Array<ContactObj>;
-
-    // Add the definition to the Nagios CFG
-    this.contacts.forEach((contact: ContactObj, index: number) => {
-      const filename = `${contact.configuration.contact_name}.cfg`;
-      this.registerCfgFile(`contacts/${filename}`);
-    });
-  }
-
-  /*****************************************************
-  Contactgroups can only exist on host & service objects
-  ******************************************************/
-  async prepareContactGroups(): Promise<void> {
-  }
-
-  async prepareHostGroups(): Promise<void> {
-    this.hostgroups = this.dedupe('hostgroup_name', this.hostgroups) as Array<HostGroupObj>;
-
-    this.hostgroups.forEach((hostgroup: HostGroupObj) => {
-      if (!hostgroup.configuration.members || hostgroup.configuration.members === '') {
-        hostgroup.configuration.members = hostgroup.members.map((host: HostObj) => host.configuration.host_name).join(',');
-      }
-
-      const filename = `${hostgroup.configuration.hostgroup_name}.cfg`;
-      this.registerCfgFile(`hostgroups/${filename}`);
-    });
-  }
-
-  async prepareHosts(): Promise<void> {
-    this.hosts = this.dedupe('host_name', this.hosts) as Array<HostObj>;
-
-    // Add the definition to the Nagios CFG
-    this.hosts.forEach((host: HostObj, index: number) => {
-      const contacts: Set<string> = new Set();
-      const contactGroups: Set<string> = new Set();
-      host.contacts.forEach((contact: ContactObj | ContactGroupObj) => {
-        if (contact instanceof ContactObj) {
-          contacts.add(contact.configuration.contact_name);
-        } else if (contact instanceof ContactGroupObj) {
-          contactGroups.add(contact.configuration.contactgroup_name);
-        }
-      });
-
-      if (contacts.size <= 0 && contactGroups.size <= 0) {
-        throw new Error(`Host ${host.configuration.host_name} requires at least one contact or contact group`);
-      }
-
-      host.configuration.contacts = Array.from(contacts).join(',');
-      host.configuration.contact_groups = Array.from(contactGroups).join(',');
-      if (host.configuration.contacts === '') delete host.configuration.contacts;
-      if (host.configuration.contact_groups === '') delete host.configuration.contact_groups;
-
-      const filename = `${host.configuration.host_name}.cfg`;
-      this.registerCfgFile(`hosts/${filename}`);
-
-      if (!host.configuration.check_command || host.configuration.check_command === '') {
-        host.configuration.check_command = `nagios-cli!hosts[${index}].check`;
-      }
-
-    });
-  }
-
-  async prepareServices(): Promise<void> {
-    this.services = this.dedupe('name', this.services) as Array<ServiceObj>;
-
-    this.services.forEach((service: ServiceObj, index: number) => {
-      this.registerCfgFile(`services/${service.configuration.name}.cfg`);
-    });
-  }
-
-  async prepareTimeperiods(): Promise<void> {
-    this.timeperiods = this.dedupe('timeperiod_name', this.timeperiods) as Array<TimeperiodObj>;
-    this.timeperiods.forEach((timeperiod: TimeperiodObj, index: number) => {
-      this.registerCfgFile(`timeperiods/${timeperiod.configuration.timeperiod_name}.cfg`);
-    });
-  }
-
-  private async persist(): Promise<any> {
+  private async persist(objects: CollectedObjects): Promise<void> {
     // Prepare directory structure
     await fs.mkdirs(this.outputDir);
     await fs.mkdirs(path.join(this.outputDir, 'commands'));
@@ -249,114 +73,38 @@ export default class Compiler {
     // Processs object definitions
     // Use promises to speed up the processing
     const promises: Array<Promise<any>> = [];
-    promises.push(...this.contacts.map((contact: ContactObj) => fs.writeFile(path.join(this.outputDir, `contacts/${contact.configuration.contact_name}.cfg`), this.toObject(contact), 'utf-8')));
-    promises.push(...this.contactgroups.map((contactgroup: ContactGroupObj) => fs.writeFile(path.join(this.outputDir, `contactgroupss/${contactgroup.configuration.contactgroup_name}.cfg`), this.toObject(contactgroup), 'utf-8')));
-    promises.push(...this.hosts.map((host: HostObj) => fs.writeFile(path.join(this.outputDir, `hosts/${host.configuration.host_name}.cfg`), this.toObject(host), 'utf-8')));
-    promises.push(...this.hostgroups.map((hostgroup: HostGroupObj) => fs.writeFile(path.join(this.outputDir, `hosts/${hostgroup.configuration.hostgroup_name}.cfg`), this.toObject(hostgroup), 'utf-8')));
-    promises.push(...this.services.map((service: ServiceObj) => fs.writeFile(path.join(this.outputDir, `services/${service.configuration.name}.cfg`), this.toObject(service), 'utf-8')));
-    promises.push(...this.timeperiods.map((timeperiod: TimeperiodObj) => fs.writeFile(path.join(this.outputDir, `timeperiods/${timeperiod.configuration.timeperiod_name}.cfg`), this.toObject(timeperiod), 'utf-8')));
-
-    // Process command
-    const binPath = path.resolve(path.join(process.cwd(), './node_modules/.bin/nagios-cli'));
-    promises.push(fs.writeFile(path.join(this.outputDir, `commands/nagios-cli.cfg`), `
-define command {
-  command_name  nagios-cli
-  command_line /usr/bin/env node ${binPath} execute -f ${this.filepath} $ARG1$
-}`, 'utf-8'));
-
-    // Sort the inclusion of CFG files
-    this.nagios.configuration.cfg_file.sort((a, b) => {
-      let result;
-      if (a.indexOf('/') < 0 && b.indexOf('/') < 0) return 0;
-      if (a.indexOf('/') < 0 && b.indexOf('/') >= 0) return 1;
-      if (a.indexOf('/') >= 0 && b.indexOf('/') < 0) return -1;
-
-      if (a.indexOf('/') >= 0 && b.indexOf('/') >= 0) {
-        switch (a.substr(0, a.indexOf('/'))) {
-          case 'commands':
-          case 'contacts':
-          case 'contactgroups':
-          case 'timeperiods':
-           return -1;
-         default:
-           return 1;
-        }
-      }
-    });
+    objects.commands.forEach((command: CommandObj) => promises.push(fs.writeFile(path.join(this.outputDir, `commands/${command.command_name}.cfg`), command.toObject(), 'utf-8')));
+    objects.contacts.forEach((contact: ContactObj) => promises.push(fs.writeFile(path.join(this.outputDir, `contacts/${contact.contact_name}.cfg`), contact.toObject(), 'utf-8')));
+    objects.contactgroups.forEach((contactgroup: ContactGroupObj) => promises.push(fs.writeFile(path.join(this.outputDir, `contactgroupss/${contactgroup.contactgroup_name}.cfg`), contactgroup.toObject(), 'utf-8')));
+    objects.hosts.forEach((host: HostObj) => promises.push(fs.writeFile(path.join(this.outputDir, `hosts/${host.host_name}.cfg`), host.toObject(), 'utf-8')));
+    objects.hostgroups.forEach((hostgroup: HostGroupObj) => promises.push(fs.writeFile(path.join(this.outputDir, `hostgroups/${hostgroup.hostgroup_name}.cfg`), hostgroup.toObject(), 'utf-8')));
+    objects.services.forEach((service: ServiceObj) => promises.push(fs.writeFile(path.join(this.outputDir, `services/${service.name}.cfg`), service.toObject(), 'utf-8')));
+    objects.servicegroups.forEach((servicegroup: ServiceGroupObj) => promises.push(fs.writeFile(path.join(this.outputDir, `servicegroups/${servicegroup.servicegroup_name}.cfg`), servicegroup.toObject(), 'utf-8')));
+    objects.timeperiods.forEach((timeperiod: TimeperiodObj) => promises.push(fs.writeFile(path.join(this.outputDir, `timeperiods/${timeperiod.timeperiod_name}.cfg`), timeperiod.toObject(), 'utf-8')));
 
     // Process resource file
     if (this.nagios.resource) {
-      promises.push(fs.writeFile(path.join(this.outputDir, `resource.cfg`), this.toCfg(this.nagios.resource), 'utf-8'));
-      this.nagios.configuration.resource_file = 'resource.cfg';
+      promises.push(fs.writeFile(path.join(this.outputDir, `resource.cfg`), this.nagios.toObject(this.nagios.resource), 'utf-8'));
+      (<Nagios>this.nagios._decorator).resource_file = 'resource.cfg';
     }
 
     // Process CGI file
     if (this.nagios.cgi) {
-      promises.push(fs.writeFile(path.join(this.outputDir, `cgi.cfg`), this.toCfg(this.nagios.cgi), 'utf-8'));
+      promises.push(fs.writeFile(path.join(this.outputDir, `cgi.cfg`), this.nagios.toObject(this.nagios.cgi), 'utf-8'));
     }
 
     // Process nagios configuration
-    promises.push(fs.writeFile(path.join(this.outputDir, `nagios.cfg`), this.toCfg(this.nagios.configuration), 'utf-8'));
-    return Promise.all(promises);
-  }
+    promises.push(fs.writeFile(path.join(this.outputDir, `nagios.cfg`), this.nagios.toObject(), 'utf-8'));
 
-  private toCfg(configuration: { [id: string]: any }) {
-    let cfg = '\n';
-    Object.keys(configuration).forEach(key => {
-      let value = configuration[key];
-      if (value instanceof Array) {
-        value.forEach(item => cfg += `${key}=${item}\n`);
-      } else if (typeof value === 'boolean') {
-        value = value ? '1' : '0';
-        cfg += `${key}=${value}\n`;
-      } else {
-        cfg += `${key}=${value}\n`;
-      }
-    });
-    return cfg;
-  }
-
-  private toObject(instance: NagiosObj|InheritableNagiosObj) {
-    let cfg = '\n';
-    cfg += `define ${instance.objectType} {\n`;
-
-    Object.keys(instance.configuration).forEach(key => {
-      let value = instance.configuration[key];
-      if (value instanceof Array) {
-        value = value.join(',');
-      } else if (typeof value === 'boolean') {
-        value = value ? '1' : '0';
-      }
-      cfg += `\t${key}\t${value}\n`;
-    });
-
-    cfg += '\n}';
-    return cfg;
-  }
-
-  private dedupe(key: string, items: Array<NagiosObj>): Array<NagiosObj> {
-    const names: Array<string> = [];
-    return items.filter((obj: NagiosObj) => {
-      const name = obj.configuration[key];
-      if (names.indexOf(name) >= 0) return false;
-      names.push(name);
-      return true;
-    });
+    // Wait for all files to be written
+    await Promise.all(promises);
   }
 
   private registerCfgFile(filename: string) {
-    this.nagios.configuration.cfg_file = this.nagios.configuration.cfg_file || [];
-    if (this.nagios.configuration.cfg_file.indexOf(filename) < 0) {
-      this.nagios.configuration.cfg_file.push(filename);
+    (<Nagios>this.nagios._decorator).cfg_file = (<Nagios>this.nagios._decorator).cfg_file || [];
+    if ((<Nagios>this.nagios._decorator).cfg_file.indexOf(filename) < 0) {
+      (<Nagios>this.nagios._decorator).cfg_file.push(filename);
     }
-  }
-
-  private getCommand(): NagiosObj {
-    const binPath = path.resolve(path.join(process.cwd(), 'bin/nagios-cli'));
-    const command = new CommandObj();
-    command.configuration['command_name'] = 'nagios-cli';
-    command.configuration['command_line'] = '/usr/bin/env node ${binPath} execute -f ${this.filepath} $ARG1$';
-    return command;
   }
 
   static getEntryPoint(file?: string): EntryPoint {
