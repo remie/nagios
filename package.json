@@ -2,23 +2,25 @@
   "name": "@remie/nagios-cli",
   "version": "0.4.2",
   "description": "Nagios Core + Docker + TypeScript = 🤔😊😍",
-  "dependencies": {
-    "commander": "^2.11.0",
-    "fs-extra": "^4.0.1",
-    "lodash.clonedeep": "^4.5.0",
-    "npmi": "^3.0.0",
-    "slugify": "^1.3.0"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/remie/nagios"
   },
-  "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
   "scripts": {
     "dev": "./node_modules/.bin/gulp watch",
     "build": "./node_modules/.bin/gulp build",
     "test": "./bin/test.sh",
     "prepack": "npm run build"
   },
-  "bin": {
-    "nagios-cli": "./bin/nagios-cli"
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "dependencies": {
+    "commander": "^2.11.0",
+    "fs-extra": "^4.0.1",
+    "lodash.clonedeep": "^4.5.0",
+    "npmi": "^3.0.0",
+    "slugify": "^1.3.0"
   },
   "devDependencies": {
     "@types/node": "^9.6.20",
@@ -29,5 +31,8 @@
     "gulp-typescript": "^4.0.2",
     "tslint": "^5.0.0",
     "typescript": "^2.8.3"
+  },
+  "bin": {
+    "nagios-cli": "./bin/nagios-cli"
   }
 }
