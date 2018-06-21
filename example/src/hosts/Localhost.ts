@@ -1,13 +1,15 @@
 
 import { Host, HostObj, ServiceObj, ContactObj, ContactGroupObj, Include, Check } from '@remie/nagios-cli';
-import { SIDiskService, SILoadService, SIProcessesService, SISwapService, SIUsersService, PingService, SSHService, HTTPService } from '../services';
-import { Ping, SIType } from '../checks';
+import { SSH } from '../checks/SSH';
+import { Ping } from '../checks/Ping';
+import { HTTP } from '../checks/HTTP';
+import { SI , SIOptions, SIType } from '../checks/SI';
+import { Service } from '../services/Service';
 import DefaultContact from '../contacts/DefaultContact';
 import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
 
 @Host({
   host_name: 'localhost',
-  alias: '127.0.0.1',
   address: '127.0.0.1',
   check_interval: 5,
   retry_interval: 1,
@@ -21,18 +23,18 @@ import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
 })
 @Include(DefaultTimeperiod)
 export class Localhost extends HostObj {
-  check: Check = new Ping(this.configuration.address);
+  check_command: Check = new Ping(this.address);
   contacts: Array<ContactObj|ContactGroupObj> = [ DefaultContact ];
 
   services: Array<ServiceObj> = [
-    new SILoadService('Current Load'),
-    new SIUsersService('Current Users'),
-    new HTTPService('HTTP', `http://${this.configuration.address}`),
-    new PingService('PING', this.configuration.address),
-    new SIDiskService('Root Partition', '/'),
-    new SSHService('SSH', this.configuration.address),
-    new SISwapService('Swap Usage'),
-    new SIProcessesService('Total Processes')
+    new Service('Current Load', new SI(SIType.Load)),
+    new Service('Current Users', new SI(SIType.Users)),
+    new Service('HTTP', new HTTP(`http://${this.address}`)),
+    new Service('PING', new Ping(this.address)),
+    new Service('Root Partition', new SI(SIType.Disk, { mountpoint: '/' })),
+    new Service('SSH', new SSH(this.address)),
+    new Service('Swap Usage', new SI(SIType.Swap)),
+    new Service('Total Processes', new SI(SIType.Processes))
   ];
 }
 

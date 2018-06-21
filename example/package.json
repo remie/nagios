@@ -1,7 +1,7 @@
 {
-  "name": "nagios-example-ts",
+  "name": "nagios-ts-scaffolding",
   "version": "0.0.1",
-  "description": "",
+  "description": "Scaffolding project for Nagios Core + Docker + TypeScript = 🤔😊😍",
   "main": "./build/index.js",
   "scripts": {
     "start": "docker build -t nagios-example . && docker run --rm -it --name nagios-example -p 8000:80 nagios-example",
@@ -9,11 +9,11 @@
     "compile": "npm run build && ./node_modules/.bin/nagios-cli compile -f ./build/index.js",
     "test": "./test.sh"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Remie Bolte <r.bolte@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
+    "@types/node": "^10.3.4",
     "@types/systeminformation": "^3.23.0",
-    "axios": "^0.18.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-sourcemaps": "^2.6.4",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@remie/nagios-cli": "latest",
+    "axios": "^0.18.0",
     "filesize": "^3.6.1",
     "ping": "^0.2.2",
     "ssh2": "^0.6.1",

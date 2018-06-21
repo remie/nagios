@@ -1,5 +1,5 @@
 
-import { Notify } from '../checks/';
+import { Notify } from '../checks/Notify';
 import { Contact, ContactObj, Include, Check, ObjectType, NagiosObj } from '@remie/nagios-cli';
 import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
 
@@ -12,13 +12,8 @@ import DefaultTimeperiod from '../timeperiods/DefaultTimeperiod';
 @Include(DefaultTimeperiod)
 export class DefaultContact extends ContactObj {
 
-  serviceNotificationCommand(): Check {
-    return new Notify('You\'ve been served');
-  }
-
-  hostNotificationCommand(): Check {
-    return new Notify('You\'ve been served');
-  }
+  service_notification_commands: Check = new Notify('You\'ve been served');
+  host_notification_commands: Check = new Notify('You\'ve been served');
 
 }
 

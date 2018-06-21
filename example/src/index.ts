@@ -12,7 +12,7 @@ import { resources } from './resources.cfg';
 @Nagios(cfg, cgi, resources)
 export default class DefaultNagiosConfiguration extends NagiosCfg {
 
-  get hosts(): Array<HostObj> {
+  get hosts(): Array<HostObj|HostGroupObj> {
     return [
       Localhost
     ];
