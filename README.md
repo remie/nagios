@@ -45,7 +45,9 @@ A big shoutout to the development team of [Guidion](https://guidion.com), which 
 
 Like any other tech company, they are always looking for good people. If you fancy working in an inspiring environment that incubated this project, check out [their career site](https://werkenbijguidion.com) (sorry, dutch site only).
 
-
+<br />
+<br />
+<br />
 <p align="center">
 <img src="http://youtransfer.io/assets/holland.png" alt="Founded in Holland" width="150" /><br />
 <a href="https://www.iamsterdam.com/en/business/startupamsterdam">Made in Amsterdam</a> with ♥<br /><br />
