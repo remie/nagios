@@ -40,9 +40,9 @@ If you run `npm start` you will be able to see the outcome of the example projec
 
 If you want to start creating your own object definitions, look at the [Decorators & Interfaces](https://github.com/remie/nagios/wiki/Decorators-&-interfaces) and [Object classes](https://github.com/remie/nagios/wiki/Object-classes) pages.
 
-## Example project
+### Example project
 
-You can also learn a lot by looking at the example project code, which you can find [here](https://github.com/remie/nagios/tree/master/example). This project will show you how you can use the abstract classes and TypeScript decorators to create your own configuration.
+You can also learn a lot by looking at the example project code, which you can find [here](https://github.com/remie/nagios/tree/master/example). This project will show you how to use the abstract classes and TypeScript decorators to create your own configuration.
 
 ## 🎉🎉 Acknowledgements 🎉🎉
 A big shoutout to the development team of [Guidion](https://guidion.com), which served as a guinee pig for this project. They provided real-life examples, good discussions on architecture and a clear direction on what a developer would expect out of working with Nagios.
