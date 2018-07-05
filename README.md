@@ -47,7 +47,7 @@ Like any other tech company, they are always looking for good people. If you fan
 
 <br />
 <br />
-<br />
+<hr style="border: 1px solid silver" />
 <p align="center">
 <img src="http://youtransfer.io/assets/holland.png" alt="Founded in Holland" width="150" /><br />
 <a href="https://www.iamsterdam.com/en/business/startupamsterdam">Made in Amsterdam</a> with ♥<br /><br />
