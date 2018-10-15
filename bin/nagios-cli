@@ -75,7 +75,10 @@ program.command('execute [identifier]')
             const cmd = eval(`objects.${identifier}`);
             if (cmd) { 
               cmd.execute(process.env).then((result) => {
-                console.log(result.message);
+                const lines = (result.message instanceof Array)
+                  ? result.message
+                  : result.message.split('\n');
+                lines.forEach((line) => { console.log(line); });
                 process.exit(result.code);
               }).catch((error) => {
                 console.log(error.toString());
