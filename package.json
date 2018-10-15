@@ -8,8 +8,8 @@
     "url": "https://github.com/remie/nagios"
   },
   "scripts": {
-    "dev": "./node_modules/.bin/gulp watch",
-    "build": "./node_modules/.bin/gulp build",
+    "dev": "./node_modules/gulp/bin/gulp.js watch",
+    "build": "./node_modules/gulp/bin/gulp.js build",
     "test": "./bin/test.sh",
     "prepack": "npm run build"
   },
