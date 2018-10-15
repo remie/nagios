@@ -61,12 +61,16 @@ export class Collector {
       } else if (obj instanceof HostObj && !this.hosts.has(obj.host_name)) {
         skipProcessing = false;
         this.hosts.set(obj.host_name, obj);
-        obj.services.forEach((service) => service.host_name = obj);
+        if (obj.services && obj.services instanceof Array) {
+          obj.services.forEach((service) => service.host_name = obj);
+        }
         references.push(...obj.references);
       } else if (obj instanceof HostGroupObj && !this.hostgroups.has(obj.hostgroup_name)) {
         skipProcessing = false;
         this.hostgroups.set(obj.hostgroup_name, obj);
-        obj.services.forEach((service) => service.hostgroup_name = obj);
+        if (obj.services && obj.services instanceof Array) {
+          obj.services.forEach((service) => service.hostgroup_name = obj);
+        }
         references.push(...obj.references);
       } else if (obj instanceof ServiceObj) {
         let host: HostObj|HostGroupObj;
