@@ -5,6 +5,9 @@
             "./typings/gobals",
             "./typings/modules"
         ],
+        "lib": [
+            "es2018"
+        ],
         "experimentalDecorators": true,
         "module": "commonjs",
         "target": "es6",

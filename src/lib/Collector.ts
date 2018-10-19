@@ -114,7 +114,10 @@ export class Collector {
         // Get objects from properties
         const proto = Object.getPrototypeOf(obj);
         const properties = Object.getOwnPropertyNames(proto);
-        const keys = [ ...Object.keys(obj), ...properties ];
+        const getters = Object.entries(Object.getOwnPropertyDescriptors(proto))
+          .filter(([key, descriptor]) => typeof descriptor.get === 'function')
+          .map(([key]) => key);
+        const keys = [ ...Object.keys(obj), ...properties, ...getters ];
 
         keys.filter((key: string) => key !== 'constructor' && !(/^_/).test(key))
           .forEach((key: string) => {
