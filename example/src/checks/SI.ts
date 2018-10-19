@@ -4,16 +4,16 @@ import * as si from 'systeminformation';
 import * as filesize from 'filesize';
 
 export class SI implements Check {
-  private _type: SIType;
-  private _options: SIOptions;
+  private $type: SIType;
+  private $options: SIOptions;
 
   constructor(type: SIType, options?: SIOptions) {
-    this._type = type;
-    this._options = options;
+    this.$type = type;
+    this.$options = options;
   }
 
   async execute(): Promise<CheckResult> {
-    switch (this._type) {
+    switch (this.$type) {
       case SIType.Load:
         return this.checkLoad();
       case SIType.Disk:
@@ -36,7 +36,7 @@ export class SI implements Check {
   }
 
   private async checkDisk(): Promise<CheckResult> {
-    const options = <SIDiskOptions>this._options;
+    const options = <SIDiskOptions>this.$options;
     const devices: Array<si.Systeminformation.BlockDevicesData> = await si.blockDevices();
     devices.filter((device) => device.mount === options.mountpoint);
     const device: si.Systeminformation.BlockDevicesData = devices.length > 0 ? devices[0] : null;

@@ -6,7 +6,7 @@ export class RefObj {
   instance: NagiosObj|InheritableNagiosObj;
 
   constructor(instance: NagiosObj|InheritableNagiosObj) {
-    this.type = instance._objectType;
+    this.type = instance.$objectType;
     this.instance = instance;
   }
 }

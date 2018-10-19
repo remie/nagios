@@ -9,16 +9,16 @@ import * as cloneDeep from 'lodash.clonedeep';
 // ------------------------------------------------------------------------------------------ Classes
 
 export abstract class AbstractNagiosObj implements NagiosObj {
-  readonly _decorator?: ObjectDefinition;
-  readonly _references?: Array<RefObj>;
-  readonly _objectType: ObjectType;
+  readonly $decorator?: ObjectDefinition;
+  readonly $references?: Array<RefObj>;
+  readonly $objectType: ObjectType;
 
   constructor(objectType: ObjectType) {
-    this._objectType = objectType;
+    this.$objectType = objectType;
 
     // Copy the decorator properties to the object
-    for (let key in this._decorator) {
-      this[key] = this._decorator[key];
+    for (let key in this.$decorator) {
+      this[key] = this.$decorator[key];
     }
   }
 
@@ -34,8 +34,8 @@ export abstract class AbstractNagiosObj implements NagiosObj {
     const references: Array<RefObj> = [];
 
     // Include any decorator references (@Include / @Use)
-    if (this._references) {
-      references.push(...this._references);
+    if (this.$references) {
+      references.push(...this.$references);
     }
 
     // Get references from properties
@@ -78,7 +78,7 @@ export abstract class AbstractNagiosObj implements NagiosObj {
 
   toObject(): string {
     let cfg = '\n';
-    cfg += `define ${this._objectType} {\n`;
+    cfg += `define ${this.$objectType} {\n`;
 
     const definition: ObjectDefinition = this.toObjectDefinition();
     Object.keys(definition).forEach((key) => {
@@ -114,8 +114,8 @@ export abstract class AbstractNagiosObj implements NagiosObj {
 }
 
 export abstract class AbstractInheritableNagiosObj extends AbstractNagiosObj implements InheritableNagiosObj {
-  name: string = (<InheritableObjectDefinition>this._decorator).name || this.getObjName(this);
-  register: boolean = ((<InheritableObjectDefinition>this._decorator).register !== undefined) ? (<InheritableObjectDefinition>this._decorator).register : true;
+  name: string = (<InheritableObjectDefinition>this.$decorator).name || this.getObjName(this);
+  register: boolean = ((<InheritableObjectDefinition>this.$decorator).register !== undefined) ? (<InheritableObjectDefinition>this.$decorator).register : true;
   use?: string;
 }
 
@@ -189,9 +189,9 @@ export class RequiredFieldValidator {
 // ------------------------------------------------------------------------------------------ Interfaces & types
 
 export interface NagiosObj {
-  readonly _decorator?: ObjectDefinition;
-  readonly _references?: Array<RefObj>;
-  readonly _objectType?: ObjectType;
+  readonly $decorator?: ObjectDefinition;
+  readonly $references?: Array<RefObj>;
+  readonly $objectType?: ObjectType;
 }
 
 export interface InheritableNagiosObj extends NagiosObj {
