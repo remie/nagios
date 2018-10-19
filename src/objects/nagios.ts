@@ -30,7 +30,7 @@ export abstract class NagiosCfg extends AbstractNagiosObj {
   }
 
   toObjectDefinition(): Nagios {
-    return cloneDeep(this._decorator) as Nagios;
+    return cloneDeep(this.$decorator) as Nagios;
   }
 
   toObject(definition?: { [id: string]: any }) {

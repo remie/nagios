@@ -85,7 +85,7 @@ export default class Compiler {
     // Process resource file
     if (this.nagios.resource) {
       promises.push(fs.writeFile(path.join(this.outputDir, `resource.cfg`), this.nagios.toObject(this.nagios.resource), 'utf-8'));
-      (<Nagios>this.nagios._decorator).resource_file = 'resource.cfg';
+      (<Nagios>this.nagios.$decorator).resource_file = 'resource.cfg';
     }
 
     // Process CGI file
@@ -101,9 +101,9 @@ export default class Compiler {
   }
 
   private registerCfgFile(filename: string) {
-    (<Nagios>this.nagios._decorator).cfg_file = (<Nagios>this.nagios._decorator).cfg_file || [];
-    if ((<Nagios>this.nagios._decorator).cfg_file.indexOf(filename) < 0) {
-      (<Nagios>this.nagios._decorator).cfg_file.push(filename);
+    (<Nagios>this.nagios.$decorator).cfg_file = (<Nagios>this.nagios.$decorator).cfg_file || [];
+    if ((<Nagios>this.nagios.$decorator).cfg_file.indexOf(filename) < 0) {
+      (<Nagios>this.nagios.$decorator).cfg_file.push(filename);
     }
   }
 

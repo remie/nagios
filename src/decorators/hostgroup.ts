@@ -4,7 +4,7 @@ import { NagiosClass, NagiosObj } from '../objects';
 
 export function HostGroup(configuration: HostGroup) {
   return function (constructor: NagiosClass<NagiosObj>): any {
-    constructor.prototype._decorator = configuration;
+    constructor.prototype.$decorator = configuration;
     return constructor;
   };
 }

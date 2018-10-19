@@ -4,7 +4,7 @@ import { NagiosClass, NagiosObj } from '../objects';
 
 export function Service(configuration: Service) {
   return function (constructor: NagiosClass<NagiosObj>): any {
-    constructor.prototype._decorator = configuration;
+    constructor.prototype.$decorator = configuration;
     return constructor;
   };
 }

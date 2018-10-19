@@ -4,7 +4,7 @@ import { AbstractInheritableNagiosObj, ObjectType, RequiredFieldValidator, Conta
 
 export abstract class ServiceObj extends AbstractInheritableNagiosObj {
 
-  _host?: HostObj;
+  $host?: HostObj;
 
   // ------------------------------------------------------------------------------------------ Properties
   // All properties are marked optional because they can also be set using the decorator
