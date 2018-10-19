@@ -43,7 +43,7 @@ export abstract class AbstractNagiosObj implements NagiosObj {
     const properties = Object.getOwnPropertyNames(proto);
     const keys = [ ...Object.keys(this), ...properties ];
 
-    keys.filter((key: string) => key !== 'constructor' && !(/^_/).test(key))
+    keys.filter((key: string) => key !== 'constructor' && !key.startsWith('$'))
       .forEach((key: string) => {
         if (this[key] instanceof Array) {
           references.push(...this[key].map((instance) => new RefObj(instance)));
@@ -63,7 +63,7 @@ export abstract class AbstractNagiosObj implements NagiosObj {
     const properties = Object.getOwnPropertyNames(proto);
     const keys = [ ...Object.keys(this), ...properties ];
 
-    keys.filter((key: string) => key !== 'constructor' && !(/^_/).test(key))
+    keys.filter((key: string) => key !== 'constructor' && !key.startsWith('$'))
       .forEach((key: string) => {
         if (this[key] instanceof Array) {
           definition[key] = this[key].map((obj: AbstractNagiosObj) => this.getObjName(obj)).join(',');
