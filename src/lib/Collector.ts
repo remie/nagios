@@ -119,7 +119,7 @@ export class Collector {
           .map(([key]) => key);
         const keys = [ ...Object.keys(obj), ...properties, ...getters ];
 
-        keys.filter((key: string) => key !== 'constructor' && !(/^_/).test(key))
+        keys.filter((key: string) => key !== 'constructor' && !key.startsWith('$'))
           .forEach((key: string) => {
             if (obj[key] instanceof Array || typeof obj[key] === 'object') {
               this.collectByObj(obj[key]);
