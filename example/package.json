@@ -4,8 +4,10 @@
   "description": "Scaffolding project for Nagios Core + Docker + TypeScript = 🤔😊😍",
   "main": "./build/index.js",
   "scripts": {
+    "clean": "npx rimraf ./build",
+    "lint": "npx tslint --project tsconfig.json",
+    "build": "npm run clean && npm run lint && tsc --project tsconfig.json",
     "start": "docker build -t nagios-example . && docker run --rm -it --name nagios-example -p 8000:80 nagios-example",
-    "build": "./node_modules/.bin/gulp build",
     "compile": "npm run build && ./node_modules/.bin/nagios-cli compile -f ./build/index.js",
     "test": "./test.sh"
   },
@@ -14,11 +16,6 @@
   "devDependencies": {
     "@types/node": "^10.3.4",
     "@types/systeminformation": "^3.23.0",
-    "del": "^3.0.0",
-    "gulp": "^3.9.1",
-    "gulp-sourcemaps": "^2.6.4",
-    "gulp-tslint": "^8.1.3",
-    "gulp-typescript": "^4.0.2",
     "tslint": "^5.0.0",
     "typescript": "^2.8.3"
   },

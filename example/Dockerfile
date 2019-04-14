@@ -16,6 +16,6 @@ RUN npm install
 
 ## Copy sources
 COPY ./src ./src
-COPY ./gulpfile.js ./tsconfig.json ./tslint.json ./htpasswd.users ./start.sh ./
+COPY ./tsconfig.json ./tslint.json ./htpasswd.users ./start.sh ./
 
 CMD ["/opt/nagios/start.sh"]
