@@ -4,7 +4,7 @@
   "description": "Scaffolding project for Nagios Core + Docker + TypeScript = 🤔😊😍",
   "main": "./build/index.js",
   "scripts": {
-    "clean": "npx rimraf ./build",
+    "clean": "npx rimraf ./build ./config",
     "lint": "npx tslint --project tsconfig.json",
     "build": "npm run clean && npm run lint && tsc --project tsconfig.json",
     "start": "docker build -t nagios-example . && docker run --rm -it --name nagios-example -p 8000:80 nagios-example",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@remie/nagios-cli": "latest",
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "filesize": "^3.6.1",
     "ping": "^0.2.2",
     "ssh2": "^0.6.1",
