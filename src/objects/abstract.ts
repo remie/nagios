@@ -3,8 +3,7 @@
 // ------------------------------------------------------------------------------------------ Dependencies
 
 import { ObjectDefinition, InheritableObjectDefinition } from '../types/';
-import { RefObj, ContactObj, ContactGroupObj, HostObj, HostGroupObj, ServiceObj, ServiceGroupObj, TimeperiodObj } from '../objects';
-import * as cloneDeep from 'lodash.clonedeep';
+import { RefObj, ContactObj, ContactGroupObj, HostObj, HostGroupObj, ServiceGroupObj, TimeperiodObj } from '../objects';
 
 // ------------------------------------------------------------------------------------------ Classes
 

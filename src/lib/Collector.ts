@@ -1,5 +1,4 @@
 
-import * as path from 'path';
 import { CommandObj } from '../objects/command';
 import { NagiosCfg, NagiosObj, InheritableNagiosObj, RefObj, ContactObj, ContactGroupObj, HostObj, HostGroupObj, ServiceObj, ServiceGroupObj, TimeperiodObj } from '../objects';
 import slugify from 'slugify';

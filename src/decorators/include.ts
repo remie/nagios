@@ -1,6 +1,5 @@
 
-import { Timeperiod } from '../types';
-import { NagiosClass, NagiosObj, InheritableNagiosObj, RefObj, ObjectType } from '../objects';
+import { NagiosClass, NagiosObj, InheritableNagiosObj, RefObj } from '../objects';
 
 export function Include(ref: NagiosObj|InheritableNagiosObj) {
   return function (constructor: NagiosClass<NagiosObj|InheritableNagiosObj>): any {

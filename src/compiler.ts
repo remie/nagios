@@ -2,14 +2,11 @@
 
 // ------------------------------------------------------------------------------------------ Dependencies
 
-import del from 'del';
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import * as cloneDeep from 'lodash.clonedeep';
-import slugify from 'slugify';
 
-import { Nagios, Timeperiod, Contact, ContactGroup } from './types';
-import { RefObj, ObjectType, ContactObj, ContactGroupObj, HostObj, HostGroupObj, NagiosCfg, NagiosObj, InheritableNagiosObj, ServiceObj, ServiceGroupObj, TimeperiodObj, AbstractNagiosObj } from './objects';
+import { Nagios } from './types';
+import { ContactObj, ContactGroupObj, HostObj, HostGroupObj, NagiosCfg, ServiceObj, ServiceGroupObj, TimeperiodObj } from './objects';
 import { NagiosCommand } from './lib/NagiosCommand';
 import { CommandObj } from './objects/command';
 

@@ -1,6 +1,6 @@
 
 import { Host, Check } from '../types';
-import { NagiosObj, AbstractInheritableNagiosObj, ServiceObj, ContactObj, ContactGroupObj, HostGroupObj, TimeperiodObj, ObjectType, RequiredFieldValidator } from './index';
+import { AbstractInheritableNagiosObj, ServiceObj, ContactObj, ContactGroupObj, HostGroupObj, TimeperiodObj, ObjectType, RequiredFieldValidator } from './index';
 
 export abstract class HostObj extends AbstractInheritableNagiosObj {
 

@@ -1,5 +1,5 @@
 
-import { AbstractNagiosObj, NagiosObj, InheritableNagiosObj, ObjectType } from './index';
+import { NagiosObj, InheritableNagiosObj, ObjectType } from './index';
 
 export class RefObj {
   type: ObjectType;

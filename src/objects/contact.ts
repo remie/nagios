@@ -1,6 +1,6 @@
 
 import { Contact, Check } from '../types';
-import { NagiosObj, AbstractInheritableNagiosObj, ContactGroupObj, TimeperiodObj, ObjectType, RequiredFieldValidator } from './index';
+import { AbstractInheritableNagiosObj, ContactGroupObj, TimeperiodObj, ObjectType, RequiredFieldValidator } from './index';
 
 export abstract class ContactObj extends AbstractInheritableNagiosObj {
 

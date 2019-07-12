@@ -1,6 +1,6 @@
 
 import { Nagios, Cgi, Resource } from '../types';
-import { AbstractNagiosObj, HostObj, HostGroupObj, ServiceObj, ServiceGroupObj, ObjectType, RequiredFieldValidator } from './index';
+import { AbstractNagiosObj, HostObj, HostGroupObj, ObjectType, RequiredFieldValidator } from './index';
 import * as cloneDeep from 'lodash.clonedeep';
 
 export abstract class NagiosCfg extends AbstractNagiosObj {
