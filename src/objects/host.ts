@@ -60,7 +60,7 @@ export abstract class HostObj extends AbstractInheritableNagiosObj {
 
   // ------------------------------------------------------------------------------------------ Getters & Setters
 
-  services?: Array<ServiceObj>;
+  services?: Array<ServiceObj>|Promise<Array<ServiceObj>>;
 
   toObjectDefinition(): Host {
     const definition = super.toObjectDefinition() as Host;

@@ -24,7 +24,7 @@ export abstract class HostGroupObj extends AbstractInheritableNagiosObj {
 
   // ------------------------------------------------------------------------------------------ Getters & Setters
 
-  services: Array<ServiceObj> = [];
+  services: Array<ServiceObj>|Promise<Array<ServiceObj>> = [];
 
   toObjectDefinition(): HostGroup {
     const definition = super.toObjectDefinition() as HostGroup;

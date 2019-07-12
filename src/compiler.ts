@@ -34,7 +34,7 @@ export default class Compiler {
 
   async collect(): Promise<CollectedObjects> {
     const collector = new Collector(this.nagios);
-    const objects = collector.collect();
+    const objects = await collector.collect();
 
     // Add the custom Nagios CLI command
     const nagiosCommand = new NagiosCommand();

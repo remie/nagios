@@ -20,8 +20,11 @@ export class Collector {
     this.nagios = nagios;
   }
 
-  collect(): CollectedObjects {
-    this.nagios.hosts.forEach((obj: HostObj|HostGroupObj) => this.collectByObj(obj));
+  async collect(): Promise<CollectedObjects> {
+    const hosts = this.nagios.hosts instanceof Promise ? await this.nagios.hosts : this.nagios.hosts;
+    await hosts.reduce((previous, obj: HostObj|HostGroupObj) => previous.then(async () => {
+      await this.collectByObj(obj);
+    }), Promise.resolve());
 
     return {
       commands: this.commands,
@@ -35,11 +38,13 @@ export class Collector {
     };
   }
 
-  private collectByObj(obj: NagiosObj|InheritableNagiosObj);
-  private collectByObj(obj: Array<NagiosObj>|Array<InheritableNagiosObj>);
-  private collectByObj(obj: any): void {
+  private async collectByObj(obj: NagiosObj|InheritableNagiosObj);
+  private async collectByObj(obj: Array<NagiosObj>|Array<InheritableNagiosObj>);
+  private async collectByObj(obj: any): Promise<void> {
     if (obj instanceof Array) {
-      obj.forEach((item: NagiosObj|InheritableNagiosObj) => this.collectByObj(item));
+      await obj.reduce((previous, item: NagiosObj|InheritableNagiosObj) => previous.then(async () => {
+        await this.collectByObj(item);
+      }), Promise.resolve());
     } else {
 
       const references = [];
@@ -60,15 +65,19 @@ export class Collector {
       } else if (obj instanceof HostObj && !this.hosts.has(obj.host_name)) {
         skipProcessing = false;
         this.hosts.set(obj.host_name, obj);
-        if (obj.services && obj.services instanceof Array) {
-          obj.services.forEach((service) => service.host_name = obj);
+        if (obj.services) {
+          const services = obj.services instanceof Promise ? await obj.services : obj.services;
+          services.forEach((service) => service.host_name = obj);
+          obj.services = services;
         }
         references.push(...obj.references);
       } else if (obj instanceof HostGroupObj && !this.hostgroups.has(obj.hostgroup_name)) {
         skipProcessing = false;
         this.hostgroups.set(obj.hostgroup_name, obj);
-        if (obj.services && obj.services instanceof Array) {
-          obj.services.forEach((service) => service.hostgroup_name = obj);
+        if (obj.services) {
+          const services = obj.services instanceof Promise ? await obj.services : obj.services;
+          services.forEach((service) => service.hostgroup_name = obj);
+          obj.services = services;
         }
         references.push(...obj.references);
       } else if (obj instanceof ServiceObj) {
@@ -118,16 +127,18 @@ export class Collector {
           .map(([key]) => key);
         const keys = [ ...Object.keys(obj), ...properties, ...getters ];
 
-        keys.filter((key: string) => key !== 'constructor' && !key.startsWith('$'))
-          .forEach((key: string) => {
+        await keys.filter((key: string) => key !== 'constructor' && !key.startsWith('$'))
+          .reduce((previous, key: string) => previous.then(async () => {
             if (obj[key] instanceof Array || typeof obj[key] === 'object') {
-              this.collectByObj(obj[key]);
+              await this.collectByObj(obj[key]);
             }
-          });
+          }), Promise.resolve());
       }
 
       // Get refeferenced objects
-      references.forEach((ref: RefObj) => this.collectByObj(ref.instance));
+      await references.reduce((previous, ref: RefObj) => previous.then(async () => {
+        await this.collectByObj(ref.instance);
+      }), Promise.resolve());
     }
   }
 

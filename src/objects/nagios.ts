@@ -21,7 +21,7 @@ export abstract class NagiosCfg extends AbstractNagiosObj {
 
   // ------------------------------------------------------------------------------------------ Getters & Setters
 
-  abstract hosts: Array<HostObj|HostGroupObj>;
+  abstract hosts: Array<HostObj|HostGroupObj>|Promise<Array<HostObj|HostGroupObj>>;
 
   // ------------------------------------------------------------------------------------------ Methods
 
@@ -33,7 +33,7 @@ export abstract class NagiosCfg extends AbstractNagiosObj {
     return cloneDeep(this.$decorator) as Nagios;
   }
 
-  toObject(definition?: { [id: string]: any }) {
+  toObject(definition?: { [id: string]: any }): string {
     let cfg = '\n';
     definition = definition || this.toObjectDefinition();
 
