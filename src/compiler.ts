@@ -21,9 +21,9 @@ export default class Compiler {
 
   private nagios: NagiosCfg;
 
-  constructor(entryPoint: EntryPoint, outputDir: string = './config') {
+  constructor(entryPoint: EntryPoint, outputDir: string) {
     this.nagios = <NagiosCfg>entryPoint.nagios;
-    this.outputDir = path.join(entryPoint.basedir, outputDir);
+    this.outputDir = outputDir;
     this.filepath = entryPoint.filepath;
   }
 
@@ -116,8 +116,7 @@ export default class Compiler {
         if (entryPoint) {
           return {
             nagios: entryPoint.default ? new entryPoint.default() : new entryPoint(),
-            filepath: path.resolve(file),
-            basedir: path.dirname(path.resolve(path.join(path.resolve(file), '../')))
+            filepath: path.resolve(file)
           };
         }
       }
@@ -134,6 +133,5 @@ export default class Compiler {
 
 export type EntryPoint = {
   nagios: NagiosCfg,
-  filepath: string,
-  basedir: string
+  filepath: string
 };

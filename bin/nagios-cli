@@ -32,8 +32,11 @@ program.command('init')
 program.command('compile')
        .description('Compile nagios configuration')
        .option('-f, --file <path>',  'Entry point for generating Nagios configuration, defaults to "main" property of package.json')
+       .option('-o, --outputDir <path>',  'Output directory where generating Nagios configuration is stored, defaults to "./config"', './config')
+       .option('--cwd <path>', 'Work directory for output path (applies only to relative paths), defaults to `process.cwd()`', process.cwd())
        .action(function(options) {
           const entryPoint = Compiler.getEntryPoint(options.file);
+          const outputDir = path.resolve(entryPoint.cwd, options.outputDir) 
 
           if (!entryPoint) {
             console.log();
@@ -42,7 +45,7 @@ program.command('compile')
             program.outputHelp();
             console.log();
           } else {
-            const compiler = new Compiler(entryPoint, './config');
+            const compiler = new Compiler(entryPoint, outputDir);
             compiler.compile().then(() => {
               console.log('Finished compiling Nagios configuration');
             }).catch((error) => {
