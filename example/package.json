@@ -8,7 +8,7 @@
     "lint": "npx tslint --project tsconfig.json",
     "build": "npm run clean && npm run lint && tsc --project tsconfig.json",
     "start": "docker build -t nagios-example . && docker run --rm -it --name nagios-example -p 8000:80 nagios-example",
-    "compile": "npm run build && ./node_modules/.bin/nagios-cli compile -f ./build/index.js",
+    "compile": "npm run build && npx nagios-cli compile -f ./build/index.js",
     "test": "./test.sh"
   },
   "author": "Remie Bolte <r.bolte@gmail.com>",
