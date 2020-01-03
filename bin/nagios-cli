@@ -18,15 +18,15 @@ program.version(pkg.version)
 program.command('init')
        .description('Initialise a new Nagios project')
        .action(function() {
-          fs.copy(path.join(__dirname,'../example'), process.cwd(), (err) => {
-            if(err) {
+          fs.copy(path.join(__dirname, '../example'), process.cwd(), (err) => {
+            if (err) {
               return console.error('Unable to initialise Nagios:\n' + err);
             }
 
             npmi(process.cwd(), () => {
               console.log('Nagios project initialised succesfully!');
             });
-          }); 
+          });
        });
 
 program.command('compile')
@@ -36,7 +36,7 @@ program.command('compile')
        .option('--cwd <path>', 'Work directory for output path (applies only to relative paths), defaults to `process.cwd()`', process.cwd())
        .action(function(options) {
           const entryPoint = Compiler.getEntryPoint(options.file);
-          const outputDir = path.resolve(entryPoint.cwd, options.outputDir) 
+          const outputDir = path.resolve(entryPoint.cwd, options.outputDir);
 
           if (!entryPoint) {
             console.log();
@@ -51,7 +51,7 @@ program.command('compile')
             }).catch((error) => {
               console.log('ERROR: failed to compile nagios configuration');
               console.log(error);
-            })
+            });
           }
        });
 
@@ -75,8 +75,9 @@ program.command('execute [identifier]')
             console.log('Error: no Nagios configuration entry point provided');
             process.exit(3);
           } else {
+            // tslint:disable:no-eval because this is dynamic code, we need to use eval
             const cmd = eval(`objects.${identifier}`);
-            if (cmd) { 
+            if (cmd) {
               cmd.execute(process.env).then((result) => {
                 const lines = (result.message instanceof Array)
                   ? result.message
@@ -86,7 +87,7 @@ program.command('execute [identifier]')
               }).catch((error) => {
                 console.log(error.toString());
                 process.exit(3);
-              })
+              });
             } else {
               console.log('Error: provided command identifier is invalid');
               process.exit(3);
