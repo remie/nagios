@@ -36,7 +36,7 @@ program.command('compile')
        .option('--cwd <path>', 'Work directory for output path (applies only to relative paths), defaults to `process.cwd()`', process.cwd())
        .action(function(options) {
           const entryPoint = Compiler.getEntryPoint(options.file);
-          const outputDir = path.resolve(entryPoint.cwd, options.outputDir);
+          const outputDir = path.resolve(options.cwd, options.outputDir);
 
           if (!entryPoint) {
             console.log();
