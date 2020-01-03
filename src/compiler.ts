@@ -44,6 +44,7 @@ export default class Compiler {
     objects.commands.set('nagios-cli', nagiosCommand);
 
     // Add all the objects to the cfg_file property in Nagios CFG
+    (<Nagios>this.nagios.$decorator).cfg_file = [];
     Collector.sortByName(objects.commands).forEach((obj: CommandObj) => this.registerCfgFile(`commands/${obj.command_name}.cfg`));
     Collector.sortByName(objects.timeperiods).forEach((obj: TimeperiodObj) => this.registerCfgFile(`timeperiods/${obj.timeperiod_name}.cfg`));
     Collector.sortByName(objects.contacts).forEach((obj: ContactObj) => this.registerCfgFile(`contacts/${obj.contact_name}.cfg`));
