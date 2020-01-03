@@ -10,7 +10,7 @@
   "scripts": {
     "clean": "npx rimraf ./dist",
     "lint": "npx tslint --project tsconfig.json",
-    "dev": "npx nodemon -e .ts -w src --exec 'npm run build'",
+    "start": "npx nodemon -e .ts -w src --exec 'npm run build'",
     "build": "npm run clean && npm run lint && tsc --project tsconfig.json",
     "test": "./bin/test.sh",
     "prepack": "npm run build"
