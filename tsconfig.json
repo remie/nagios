@@ -8,7 +8,6 @@
         "lib": [
             "es2018"
         ],
-        "experimentalDecorators": true,
         "module": "commonjs",
         "target": "es6",
         "noImplicitAny": false,
