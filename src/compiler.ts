@@ -38,7 +38,7 @@ export default class Compiler {
 
     // Add the custom Nagios CLI command
     const nagiosCommand = new NagiosCommand();
-    const binPath = path.resolve(path.join(process.cwd(), './node_modules/.bin/nagios-cli'));
+    const binPath = path.resolve(path.join(__dirname, '../bin/nagios-cli'));
     nagiosCommand.command_name = 'nagios-cli';
     nagiosCommand.command_line = `/usr/bin/env node ${binPath} execute -f ${this.filepath} "$ARG1$"`;
     objects.commands.set('nagios-cli', nagiosCommand);
